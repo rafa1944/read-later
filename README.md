@@ -86,6 +86,12 @@ El service worker se compila desde `src/sw/` a `public/sw.js`; `npm run dev` y
 | `AUTH_SECRET` | Firma de la cookie de sesión y de las URLs de imagen |
 | `INGEST_TOKEN` | Token con el que la extensión guarda artículos |
 
+**Cuidado al rotar `AUTH_SECRET`.** Las URLs de las imágenes se firman cuando se
+guarda el artículo y esa firma queda escrita en su HTML, así que cambiar el
+secreto deja sin imágenes todo lo guardado hasta entonces (el texto no se toca) y
+cierra las sesiones abiertas. Si hace falta rotarlo, hay que volver a generar el
+HTML de los artículos existentes.
+
 ## Despliegue
 
 Requiere una sesión iniciada del CLI de Vercel (`vercel login`).

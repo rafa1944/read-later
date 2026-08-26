@@ -54,3 +54,18 @@ test('una contraseña incorrecta no deja entrar', async ({ page }) => {
   await expect(page.getByText('Contraseña incorrecta')).toBeVisible();
   await expect(page).toHaveURL(/\/login/);
 });
+
+test('cerrar sesión devuelve al login y deja de dar acceso', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await expect(page.getByRole('link', { name: 'Archivo' })).toBeVisible();
+
+  page.once('dialog', (dialogo) => dialogo.accept());
+  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
+
+  await expect(page).toHaveURL(/\/login/);
+
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/login/);
+});

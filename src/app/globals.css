@@ -554,3 +554,18 @@ a { color: inherit; }
   color: var(--lampara);
   font-size: 0.6rem;
 }
+
+.salir {
+  margin-left: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tenue);
+  cursor: pointer;
+  font: inherit;
+}
+
+.salir:hover:not(:disabled) { color: var(--tinta); }
+
+/* Con el aviso de «sin conexión» presente, ese es quien empuja a la derecha. */
+.sin-red + .salir { margin-left: 1.25rem; }
