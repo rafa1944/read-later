@@ -11,3 +11,4 @@ playwright-report/
 next-env.d.ts
 *.tsbuildinfo
 extension/dist/
+public/sw.js

@@ -15,7 +15,10 @@
     "db:deploy": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate",
     "ext:build": "node extension/build.mjs",
     "ext:watch": "node extension/build.mjs --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:sw": "node scripts/build-sw.mjs",
+    "prebuild": "node scripts/build-sw.mjs",
+    "predev": "node scripts/build-sw.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
