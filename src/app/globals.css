@@ -29,3 +29,39 @@ body {
 }
 
 a { color: var(--acento); }
+
+.entrada {
+  max-width: 20rem;
+  margin: 6rem auto;
+  padding: 0 1.25rem;
+}
+
+.entrada label {
+  display: block;
+  color: var(--tenue);
+  font: 0.8rem/1.4 ui-sans-serif, system-ui, sans-serif;
+}
+
+.entrada input {
+  display: block;
+  width: 100%;
+  margin: 0.4rem 0 1rem;
+  padding: 0.6rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.entrada button {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--borde);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: inherit;
+  font: 0.9rem/1 ui-sans-serif, system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.error { color: #c0392b; }
