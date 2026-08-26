@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:up": "docker compose up -d db",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:deploy": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
