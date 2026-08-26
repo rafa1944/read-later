@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { destinoDe, esCacheFirst, sobrantes, urlsDeImagen } from '@/sw/estrategia';
+import {
+  destinoDe as decidir,
+  esCacheFirst,
+  sobrantes,
+  urlsDeImagen,
+} from '@/sw/estrategia';
 
 const O = 'https://leer.ejemplo.com';
+
+const destinoDe = (url: string, metodo: string, esNavegacion: boolean) =>
+  decidir(url, metodo, esNavegacion, O);
 
 describe('destinoDe', () => {
   it('manda los recursos compilados de Next a los estáticos', () => {
@@ -12,6 +20,13 @@ describe('destinoDe', () => {
   it('manda las navegaciones a las páginas', () => {
     expect(destinoDe(`${O}/`, 'GET', true)).toBe('paginas');
     expect(destinoDe(`${O}/a/123`, 'GET', true)).toBe('paginas');
+  });
+
+  it('manda a páginas también lo que no es navegación', () => {
+    // El sincronizador pide los artículos con fetch, no navegando: si esto no
+    // se cachea, no hay nada que leer sin conexión.
+    expect(destinoDe(`${O}/a/123`, 'GET', false)).toBe('paginas');
+    expect(destinoDe(`${O}/archivo`, 'GET', false)).toBe('paginas');
   });
 
   it('manda las imágenes de artículo a su propia caché', () => {

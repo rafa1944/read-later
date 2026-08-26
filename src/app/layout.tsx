@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ColaPendientes } from '@/components/cola-pendientes';
 import { RegistrarSW } from '@/components/registrar-sw';
 import { Sincronizador } from '@/components/sincronizador';
 import { GUION_INICIAL } from '@/lib/ajustes';
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <RegistrarSW />
         <Sincronizador />
+        <ColaPendientes />
       </body>
     </html>
   );

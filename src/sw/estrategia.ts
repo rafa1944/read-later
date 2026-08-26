@@ -9,7 +9,12 @@ export type Destino = keyof typeof CACHES | null;
 
 const NUNCA = ['/login', '/api/auth/', '/sw.js'];
 
-export function destinoDe(url: string, metodo: string, esNavegacion: boolean): Destino {
+export function destinoDe(
+  url: string,
+  metodo: string,
+  esNavegacion: boolean,
+  origenPropio: string,
+): Destino {
   if (metodo !== 'GET') return null;
 
   let objetivo: URL;
@@ -19,10 +24,9 @@ export function destinoDe(url: string, metodo: string, esNavegacion: boolean): D
     return null;
   }
 
-  // En el service worker se compara con el propio origen; en las pruebas no hay
-  // self.location y basta con que la ruta no case con ninguna conocida.
-  const propio = typeof self !== 'undefined' ? self.location?.origin : undefined;
-  if (propio && objetivo.origin !== propio) return null;
+  // El origen se pasa como argumento y no se lee de self.location: así la
+  // decisión es una función pura y se puede probar entera.
+  if (objetivo.origin !== origenPropio) return null;
 
   const ruta = objetivo.pathname;
   if (NUNCA.some((prefijo) => ruta === prefijo || ruta.startsWith(prefijo))) return null;
@@ -30,8 +34,13 @@ export function destinoDe(url: string, metodo: string, esNavegacion: boolean): D
   if (ruta.startsWith('/_next/static/') || ruta.startsWith('/iconos/')) return 'estaticos';
   if (ruta === '/api/img') return 'imagenes';
   if (ruta.startsWith('/api/items')) return 'datos';
-  if (esNavegacion) return 'paginas';
-  return null;
+  if (ruta.startsWith('/api/') || ruta.startsWith('/_next/')) return null;
+
+  // Cualquier otra ruta propia es una página. No basta con mirar si es una
+  // navegación: al pulsar un enlace, Next pide el contenido por RSC y no como
+  // documento, y el sincronizador tampoco navega, solo hace fetch.
+  if (esNavegacion || !/\.[a-z0-9]{2,5}$/i.test(ruta)) return 'paginas';
+  return 'estaticos';
 }
 
 /** Solo lo inmutable. Lo demás va primero a la red para no mostrar algo viejo. */

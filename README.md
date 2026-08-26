@@ -58,6 +58,25 @@ El resultado se ve en el propio botón:
 | `!` | Error. El detalle sale en la consola del service worker |
 | `⚙` | Falta configurar la extensión |
 
+## Lectura sin conexión
+
+La app es una PWA instalable. Estando abierta con red, un sincronizador guarda
+en la caché del navegador las listas, los 30 artículos pendientes más recientes
+y sus imágenes; a partir de ahí se leen sin cobertura. Lo que ya no está en
+pendientes se descarta en la siguiente sincronización, así que la caché no crece
+sin límite.
+
+Lo que se archiva o se borra sin red va a una cola en IndexedDB y se envía solo
+al volver la conexión. Mientras tanto la fila lo dice, en vez de fingir que ya
+está hecho.
+
+El aviso de «sin conexión» no se fía de `navigator.onLine`, que solo indica si
+hay una red conectada: lo levanta el service worker cuando ha tenido que servir
+algo desde la caché.
+
+El service worker se compila desde `src/sw/` a `public/sw.js`; `npm run dev` y
+`npm run build` lo hacen solos.
+
 ## Variables de entorno
 
 | Variable | Para qué |

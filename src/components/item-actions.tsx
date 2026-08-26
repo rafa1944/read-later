@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
-import { encolar, enviarPendientes } from '@/lib/cola';
+import { useState, useTransition } from 'react';
+import { encolar } from '@/lib/cola';
 
 type Props = { id: string; archivado: boolean; alBorrar?: 'refrescar' | 'volver' };
 
@@ -11,20 +11,6 @@ export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
   const [pendiente, iniciar] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [encolada, setEncolada] = useState<string | null>(null);
-
-  const vaciar = useCallback(async () => {
-    if ((await enviarPendientes()) > 0) {
-      setEncolada(null);
-      iniciar(() => router.refresh());
-    }
-  }, [router]);
-
-  useEffect(() => {
-    void vaciar();
-    const alVolver = () => void vaciar();
-    window.addEventListener('online', alVolver);
-    return () => window.removeEventListener('online', alVolver);
-  }, [vaciar]);
 
   async function llamar(metodo: 'PATCH' | 'DELETE', cuerpo?: unknown) {
     setError(null);

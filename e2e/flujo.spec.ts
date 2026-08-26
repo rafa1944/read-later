@@ -34,8 +34,10 @@ test('entrar, leer, archivar y encontrarlo en el archivo', async ({ page }) => {
   await expect(page.getByRole('heading', { name: TITULO })).toBeVisible();
   await expect(page.locator('.cuerpo')).toContainText('palabra');
 
-  // Archivar desde el lector.
+  // Archivar desde el lector, y esperar a que la interfaz lo refleje: navegar
+  // antes de eso es una carrera con el refresco.
   await page.locator('.pie').getByRole('button', { name: 'Archivar' }).click();
+  await expect(page.locator('.pie').getByRole('button', { name: 'Devolver' })).toBeVisible();
 
   // Ya no está en pendientes, sí en el archivo.
   await page.goto('/');
