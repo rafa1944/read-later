@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { RegistrarSW } from '@/components/registrar-sw';
+import { Sincronizador } from '@/components/sincronizador';
 import { GUION_INICIAL } from '@/lib/ajustes';
 import './globals.css';
 
@@ -23,7 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Antes del primer pintado, para que no haya fogonazo de color. */}
         <script dangerouslySetInnerHTML={{ __html: GUION_INICIAL }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <RegistrarSW />
+        <Sincronizador />
+      </body>
     </html>
   );
 }
