@@ -1,5 +1,5 @@
 import { clearAttempts, recordAttempt, tooManyAttempts, verifyPassword } from '@/lib/auth';
-import { cookieDeSesion, createSessionToken } from '@/lib/session';
+import { cookieDeSesion, createSessionToken, esHttps } from '@/lib/session';
 
 function direccion(request: Request): string {
   const cabecera = request.headers.get('x-forwarded-for') ?? '';
@@ -30,6 +30,10 @@ export async function POST(request: Request): Promise<Response> {
 
   return Response.json(
     { ok: true },
-    { headers: { 'set-cookie': cookieDeSesion(await createSessionToken()) } },
+    {
+      headers: {
+        'set-cookie': cookieDeSesion(await createSessionToken(), { seguro: esHttps(request) }),
+      },
+    },
   );
 }

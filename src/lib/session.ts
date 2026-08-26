@@ -28,10 +28,22 @@ export async function verifySessionToken(token: string | undefined | null): Prom
 }
 
 /**
+ * Se decide por el protocolo de la petición y no por NODE_ENV: marcar Secure en
+ * una conexión HTTP hace que el navegador descarte la cookie sin más.
+ */
+export function esHttps(request: Request): boolean {
+  if (request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https') return true;
+  return new URL(request.url).protocol === 'https:';
+}
+
+/**
  * Se serializa a mano en lugar de usar cookies() de next/headers para que las
  * rutas se puedan probar llamándolas directamente, sin un servidor detrás.
  */
-export function cookieDeSesion(token: string, maxAge = DIAS * 24 * 60 * 60): string {
+export function cookieDeSesion(
+  token: string,
+  { seguro, maxAge = DIAS * 24 * 60 * 60 }: { seguro: boolean; maxAge?: number },
+): string {
   const partes = [
     `${NOMBRE_COOKIE}=${token}`,
     'Path=/',
@@ -39,10 +51,10 @@ export function cookieDeSesion(token: string, maxAge = DIAS * 24 * 60 * 60): str
     'SameSite=Lax',
     `Max-Age=${maxAge}`,
   ];
-  if (process.env.NODE_ENV === 'production') partes.push('Secure');
+  if (seguro) partes.push('Secure');
   return partes.join('; ');
 }
 
-export function cookieBorrada(): string {
-  return cookieDeSesion('', 0);
+export function cookieBorrada(seguro: boolean): string {
+  return cookieDeSesion('', { seguro, maxAge: 0 });
 }

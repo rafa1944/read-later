@@ -3,7 +3,7 @@ import { NOMBRE_COOKIE, verifySessionToken } from '@/lib/session';
 
 const PUBLICAS = ['/login', '/api/auth/login', '/api/img'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // La extensión entra por POST /api/items con token Bearer, no con cookie.
