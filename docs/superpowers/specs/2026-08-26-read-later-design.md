@@ -52,7 +52,9 @@ sin extensión.
 - Neon Postgres, provisionado desde el Marketplace de Vercel.
 - Drizzle para esquema y migraciones.
 - `@mozilla/readability` para la extracción, en la extensión.
-- `isomorphic-dompurify` para el saneado, en el servidor.
+- `sanitize-html` para el saneado y la reescritura de imágenes, en el servidor.
+  Se prefiere a DOMPurify porque no arrastra `jsdom` y porque su
+  `transformTags` resuelve limpiamente la reescritura de `src` de imagen.
 - Vitest para pruebas unitarias y de API, Playwright para las de navegador.
 
 ### Por qué la extracción va en la extensión
@@ -119,7 +121,10 @@ de verdad y es una acción distinta, explícita en la interfaz.
 | `/api/img` | GET | Firma | Proxy de imágenes: `url`, `sig` |
 
 `POST /api/items` acepta `{url, title, byline, siteName, lang, excerpt, html,
-text, publishedTime}`. Limita el cuerpo a 5 MB. Responde `201` con el `id`, o
+publishedTime}`. Limita el cuerpo a 5 MB. El texto plano y el número de
+palabras **no** los envía el cliente: el servidor los deriva del HTML ya
+saneado, para que el contenido de búsqueda no pueda divergir del contenido
+mostrado. Responde `201` con el `id`, o
 `200` con el `id` existente si la URL ya estaba guardada.
 
 `PATCH` es la vía de las acciones offline y debe ser idempotente: reenviar el
