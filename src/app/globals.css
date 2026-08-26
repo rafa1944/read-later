@@ -1,0 +1,31 @@
+:root {
+  color-scheme: light dark;
+  --fondo: #fbfaf8;
+  --texto: #1c1b19;
+  --tenue: #6b6862;
+  --borde: #e2ded7;
+  --acento: #8a4b2a;
+  --medida: 38rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #16150f;
+    --texto: #ece9e2;
+    --tenue: #9b968c;
+    --borde: #302e28;
+    --acento: #d99a6c;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 1rem/1.6 ui-serif, Georgia, "Times New Roman", serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+a { color: var(--acento); }
