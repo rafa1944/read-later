@@ -12,3 +12,6 @@ next-env.d.ts
 *.tsbuildinfo
 extension/dist/
 public/sw.js
+.env*
+!.env.example
+.claude/settings.local.json
