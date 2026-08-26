@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Read Later — Ajustes</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --fondo: #e9eae5;
+      --tinta: #16181a;
+      --tenue: #62666a;
+      --linea: #d2d4ce;
+      --lampara: #b4761a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --fondo: #14171a; --tinta: #e4e2dc; --tenue: #8a8f94; --linea: #262a2e; --lampara: #e0a44b; }
+    }
+    body {
+      max-width: 24rem;
+      margin: 3.5rem auto;
+      padding: 0 1.5rem;
+      background: var(--fondo);
+      color: var(--tinta);
+      font: 0.95rem/1.6 ui-sans-serif, system-ui, sans-serif;
+    }
+    h1 { margin: 0 0 2rem; font: 500 1.2rem/1 ui-serif, Georgia, serif; }
+    label {
+      display: block;
+      margin-top: 1.5rem;
+      font: 600 0.66rem/1 inherit;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: var(--tenue);
+    }
+    input {
+      width: 100%;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0;
+      border: 0;
+      border-bottom: 1px solid var(--linea);
+      background: none;
+      color: inherit;
+      font: 1rem/1.4 ui-serif, Georgia, serif;
+    }
+    input:focus { outline: 0; border-bottom-color: var(--lampara); }
+    p.ayuda { margin: 0.4rem 0 0; font-size: 0.78rem; color: var(--tenue); }
+    button {
+      margin-top: 2rem;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--tinta);
+      cursor: pointer;
+      font: 600 0.66rem/1 inherit;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    #aviso { margin-top: 1.25rem; font-size: 0.85rem; min-height: 1.2em; }
+  </style>
+</head>
+<body>
+  <h1>Read Later</h1>
+  <form id="ajustes">
+    <label for="servidor">Dirección del servidor</label>
+    <input id="servidor" type="text" placeholder="https://leer.ejemplo.com" autocomplete="off">
+    <p class="ayuda">Donde tienes desplegada la aplicación.</p>
+
+    <label for="token">Token</label>
+    <input id="token" type="password" autocomplete="off">
+    <p class="ayuda">El valor de INGEST_TOKEN de tu servidor.</p>
+
+    <button type="submit">Guardar ajustes</button>
+  </form>
+  <p id="aviso"></p>
+  <script type="module" src="opciones.js"></script>
+</body>
+</html>

@@ -37,6 +37,27 @@ curl -X POST http://localhost:3000/api/items \
   -d '{"url":"https://ejemplo.com/a","title":"Título","html":"<p>Cuerpo</p>"}'
 ```
 
+## La extensión de Chrome
+
+```bash
+npm run ext:build
+```
+
+Después, en `chrome://extensions`: activar el modo de desarrollador, «Cargar
+descomprimida» y elegir `extension/dist`. En los ajustes de la extensión hay que
+poner la dirección del servidor y el `INGEST_TOKEN`, y conceder el permiso de
+dominio que pide Chrome.
+
+El botón de la barra guarda la pestaña actual; el atajo por defecto es `Alt+S`.
+El resultado se ve en el propio botón:
+
+| Badge | Significa |
+|---|---|
+| `✓` | Guardado |
+| `=` | Ya lo tenías; vuelve a pendientes si estaba archivado |
+| `!` | Error. El detalle sale en la consola del service worker |
+| `⚙` | Falta configurar la extensión |
+
 ## Variables de entorno
 
 | Variable | Para qué |

@@ -12,7 +12,10 @@
     "db:migrate": "drizzle-kit migrate",
     "db:up": "docker compose up -d db",
     "test:e2e": "playwright test",
-    "db:deploy": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate"
+    "db:deploy": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate",
+    "ext:build": "node extension/build.mjs",
+    "ext:watch": "node extension/build.mjs --watch",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",
