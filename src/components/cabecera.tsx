@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 const ENLACES = [
   { href: '/', texto: 'Pendientes' },
   { href: '/archivo', texto: 'Archivo' },
+  { href: '/buscar', texto: 'Buscar' },
 ];
 
 export function Cabecera() {

@@ -1,5 +1,5 @@
 import { verifyIngestToken } from '@/lib/auth';
-import { createItem, listItems } from '@/services/items';
+import { createItem, listItems, searchItems } from '@/services/items';
 
 const LIMITE_BYTES = 5 * 1024 * 1024;
 
@@ -55,6 +55,12 @@ export async function POST(request: Request): Promise<Response> {
 
 export async function GET(request: Request): Promise<Response> {
   const { searchParams } = new URL(request.url);
+
+  const consulta = searchParams.get('q')?.trim();
+  if (consulta) {
+    return Response.json({ items: await searchItems(consulta) });
+  }
+
   const state = searchParams.get('state') ?? 'pendientes';
 
   if (state !== 'pendientes' && state !== 'archivo') {
