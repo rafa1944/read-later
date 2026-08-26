@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { fechaCorta, minutosDeLectura } from '@/lib/formato';
 import type { ItemSummary } from '@/services/items';
+import { FilaDeslizable } from './fila-deslizable';
 import { ItemActions } from './item-actions';
 
 export function ItemCard({ item }: { item: ItemSummary }) {
   const minutos = minutosDeLectura(item.wordCount);
 
   return (
+    <FilaDeslizable id={item.id} archivado={item.archivedAt !== null}>
     <article className="fila">
       <div className="espina" style={{ ['--avance' as string]: item.scrollPct }}>
         <i />
@@ -28,5 +30,6 @@ export function ItemCard({ item }: { item: ItemSummary }) {
         <ItemActions id={item.id} archivado={item.archivedAt !== null} />
       </div>
     </article>
+    </FilaDeslizable>
   );
 }

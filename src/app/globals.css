@@ -569,3 +569,78 @@ a { color: inherit; }
 
 /* Con el aviso de «sin conexión» presente, ese es quien empuja a la derecha. */
 .sin-red + .salir { margin-left: 1.25rem; }
+
+/* ---------- Gestos ---------- */
+
+/*
+ * El tirón para recargar: una hairline ámbar que cruza arriba y se va llenando,
+ * la misma idea que la espina de progreso pero en horizontal.
+ */
+.tiron {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.tiron > i {
+  display: block;
+  height: 100%;
+  width: calc(var(--progreso, 0) * 100%);
+  background: var(--lampara);
+}
+
+.tiron.recargando > i {
+  width: 100%;
+  animation: latido 900ms ease-in-out infinite;
+}
+
+.tiron span {
+  position: absolute;
+  top: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--lampara);
+  font-size: 0.62rem;
+}
+
+@keyframes latido {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tiron.recargando > i { animation: none; }
+}
+
+/* Deslizar una fila para archivarla. */
+.deslizable {
+  position: relative;
+  overflow: hidden;
+}
+
+.accion-gesto {
+  position: absolute;
+  inset: 0 0 1px auto;
+  display: flex;
+  align-items: center;
+  padding-right: 1.1rem;
+  color: var(--tenue);
+}
+
+.accion-gesto.lista { color: var(--lampara); }
+
+.deslizante {
+  position: relative;
+  background: var(--fondo);
+  transform: translateX(calc(-1 * var(--desplazamiento, 0px)));
+  touch-action: pan-y;
+}
+
+/* Sin dedo de por medio el gesto no existe, así que no hay nada que ocultar. */
+@media (hover: hover) {
+  .accion-gesto { display: none; }
+}
+
+body { overscroll-behavior-y: contain; }

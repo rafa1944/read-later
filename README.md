@@ -77,6 +77,16 @@ algo desde la caché.
 El service worker se compila desde `src/sw/` a `public/sw.js`; `npm run dev` y
 `npm run build` lo hacen solos.
 
+## Gestos en el móvil
+
+- **Tirar hacia abajo** con la lista arriba del todo recarga y sincroniza.
+- **Deslizar una fila hacia la izquierda** la archiva, o la devuelve a pendientes
+  desde el archivo.
+
+Los dos comparten la decisión de eje (`src/lib/gestos.ts`): lo lateral archiva,
+lo vertical se desplaza, y ante la duda gana el vertical. Archivar exige más
+recorrido que recargar, porque cambia datos.
+
 ## Variables de entorno
 
 | Variable | Para qué |

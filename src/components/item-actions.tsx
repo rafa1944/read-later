@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { encolar } from '@/lib/cola';
+import { borrarItem, cambiarArchivado } from '@/lib/acciones';
 
 type Props = { id: string; archivado: boolean; alBorrar?: 'refrescar' | 'volver' };
 
@@ -12,33 +12,31 @@ export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [encolada, setEncolada] = useState<string | null>(null);
 
-  async function llamar(metodo: 'PATCH' | 'DELETE', cuerpo?: unknown) {
+  async function ejecutar(accion: 'archivar' | 'borrar') {
     setError(null);
 
-    try {
-      const respuesta = await fetch(`/api/items/${id}`, {
-        method: metodo,
-        ...(cuerpo
-          ? { headers: { 'content-type': 'application/json' }, body: JSON.stringify(cuerpo) }
-          : {}),
-      });
-      if (!respuesta.ok) throw new Error(String(respuesta.status));
+    const resultado =
+      accion === 'archivar' ? await cambiarArchivado(id, !archivado) : await borrarItem(id);
 
-      if (metodo === 'DELETE' && alBorrar === 'volver') {
-        iniciar(() => router.push('/'));
-        return;
-      }
-      iniciar(() => router.refresh());
-    } catch {
-      // Sin red: se guarda para enviarlo luego, y se dice claramente en vez de
-      // fingir que ya está hecho.
-      await encolar({ itemId: id, metodo, cuerpo });
+    if (resultado === 'encolada') {
       setEncolada(
-        metodo === 'DELETE'
+        accion === 'borrar'
           ? 'Se borrará al recuperar la conexión'
           : 'Se enviará al recuperar la conexión',
       );
+      return;
     }
+
+    if (resultado === 'error') {
+      setError('No se pudo guardar el cambio. Vuelve a intentarlo.');
+      return;
+    }
+
+    if (accion === 'borrar' && alBorrar === 'volver') {
+      iniciar(() => router.push('/'));
+      return;
+    }
+    iniciar(() => router.refresh());
   }
 
   return (
@@ -46,7 +44,7 @@ export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
       <button
         type="button"
         disabled={pendiente || encolada !== null}
-        onClick={() => llamar('PATCH', { archived: !archivado })}
+        onClick={() => void ejecutar('archivar')}
       >
         {archivado ? 'Devolver' : 'Archivar'}
       </button>
@@ -55,7 +53,7 @@ export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
         className="destructiva"
         disabled={pendiente || encolada !== null}
         onClick={() => {
-          if (confirm('¿Borrar este artículo? No se puede deshacer.')) llamar('DELETE');
+          if (confirm('¿Borrar este artículo? No se puede deshacer.')) void ejecutar('borrar');
         }}
       >
         Borrar
