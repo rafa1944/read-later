@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, isNull, lt } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, lt, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { items } from '@/db/schema';
 import { sanitizeArticle } from '@/lib/sanitize';
@@ -156,4 +156,46 @@ export async function updateItem(id: string, patch: ItemPatch): Promise<ItemDeta
 export async function deleteItem(id: string): Promise<boolean> {
   const borrados = await db.delete(items).where(eq(items.id, id)).returning({ id: items.id });
   return borrados.length > 0;
+}
+
+export type ItemResultado = ItemSummary & { snippet: string };
+
+/**
+ * Usa websearch_to_tsquery, que entiende comillas para frases y guiones para
+ * excluir, con la configuración 'simple': la misma de la columna generada, o el
+ * índice GIN no se usaría.
+ */
+export async function searchItems(consulta: string, limite = 50): Promise<ItemResultado[]> {
+  const texto = consulta.trim();
+  if (!texto) return [];
+
+  const filas = await db.execute(sql`
+    with q as (select websearch_to_tsquery('simple', ${texto}) as consulta)
+    select
+      ${items.id} as id,
+      ${items.url} as url,
+      ${items.title} as title,
+      ${items.siteName} as "siteName",
+      ${items.excerpt} as excerpt,
+      ${items.wordCount} as "wordCount",
+      ${items.savedAt} as "savedAt",
+      ${items.archivedAt} as "archivedAt",
+      ${items.scrollPct} as "scrollPct",
+      ts_headline(
+        'simple',
+        ${items.contentText},
+        q.consulta,
+        'StartSel=<mark>, StopSel=</mark>, MaxWords=28, MinWords=12, MaxFragments=1'
+      ) as snippet
+    from ${items}, q
+    where ${items.search} @@ q.consulta
+    order by ts_rank(${items.search}, q.consulta) desc, ${items.savedAt} desc
+    limit ${Math.min(limite, 200)}
+  `);
+
+  return (filas as unknown as ItemResultado[]).map((fila) => ({
+    ...fila,
+    savedAt: new Date(fila.savedAt),
+    archivedAt: fila.archivedAt ? new Date(fila.archivedAt) : null,
+  }));
 }
