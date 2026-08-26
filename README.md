@@ -116,3 +116,7 @@ vercel deploy --prod
 | `src/lib/session.ts`, `src/lib/auth.ts` | Cookie de sesión para la web app, token Bearer para la extensión |
 | `src/services/items.ts` | Toda la lógica de negocio; no sabe nada de HTTP |
 | `src/proxy.ts` | Protege las rutas; deja pasar el POST de la extensión y el proxy de imágenes |
+
+## Licencia
+
+MIT. Ver [LICENSE](LICENSE).
