@@ -4,6 +4,16 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Read Later',
+  appleWebApp: { capable: true, title: 'Read Later', statusBarStyle: 'default' },
+  icons: { apple: '/iconos/180.png' },
+};
+
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#e9eae5' },
+    { media: '(prefers-color-scheme: dark)', color: '#14171a' },
+  ],
+  viewportFit: 'cover' as const,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

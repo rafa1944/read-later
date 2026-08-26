@@ -1,7 +1,17 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { NOMBRE_COOKIE, verifySessionToken } from '@/lib/session';
 
-const PUBLICAS = ['/login', '/api/auth/login', '/api/img'];
+const PUBLICAS = [
+  '/login',
+  '/api/auth/login',
+  '/api/img',
+  // El service worker y el manifiesto se sirven sin sesión: si redirigen a
+  // /login, ni se registra el uno ni se puede instalar la app.
+  '/sw.js',
+  '/manifest.webmanifest',
+  '/iconos',
+  '/sin-conexion',
+];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
