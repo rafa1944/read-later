@@ -9,6 +9,9 @@ const ESPERA_MINIMA_MS = 5 * 60 * 1000;
 /** Se emite al terminar; lo escuchan las pruebas y podría escucharlo la interfaz. */
 export const EVENTO_SINCRONIZADO = 'read-later:sincronizado';
 
+/** Lo emite el Actualizador al volver a la app para pedir una sincronización. */
+export const EVENTO_SINCRONIZAR = 'read-later:sincronizar';
+
 export function Sincronizador() {
   useEffect(() => {
     let cancelado = false;
@@ -36,11 +39,13 @@ export function Sincronizador() {
     const temporizador = setTimeout(() => void ejecutar(), 1500);
     const alVolver = () => void ejecutar();
     window.addEventListener('online', alVolver);
+    window.addEventListener(EVENTO_SINCRONIZAR, alVolver);
 
     return () => {
       cancelado = true;
       clearTimeout(temporizador);
       window.removeEventListener('online', alVolver);
+      window.removeEventListener(EVENTO_SINCRONIZAR, alVolver);
     };
   }, []);
 
