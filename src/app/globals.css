@@ -1,67 +1,395 @@
+/*
+ * Sala de lectura: papel mate y luz de lámpara.
+ * El ámbar está reservado a la espina de progreso y al foco; los enlaces van
+ * en tinta subrayada, que se lee mejor y no compite con ella.
+ */
 :root {
   color-scheme: light dark;
-  --fondo: #fbfaf8;
-  --texto: #1c1b19;
-  --tenue: #6b6862;
-  --borde: #e2ded7;
-  --acento: #8a4b2a;
-  --medida: 38rem;
+
+  --fondo: #e9eae5;
+  --tinta: #16181a;
+  --tenue: #62666a;
+  --linea: #d2d4ce;
+  --lampara: #b4761a;
+  --peligro: #a3341f;
+
+  --medida: 34rem;
+
+  --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #16150f;
-    --texto: #ece9e2;
-    --tenue: #9b968c;
-    --borde: #302e28;
-    --acento: #d99a6c;
+    --fondo: #14171a;
+    --tinta: #e4e2dc;
+    --tenue: #8a8f94;
+    --linea: #262a2e;
+    --lampara: #e0a44b;
+    --peligro: #e07a62;
   }
 }
 
 * { box-sizing: border-box; }
 
+html { -webkit-text-size-adjust: 100%; }
+
 body {
   margin: 0;
   background: var(--fondo);
-  color: var(--texto);
-  font: 1rem/1.6 ui-serif, Georgia, "Times New Roman", serif;
-  -webkit-text-size-adjust: 100%;
+  color: var(--tinta);
+  font: 1rem/1.6 var(--serif);
+  font-synthesis-weight: none;
 }
 
-a { color: var(--acento); }
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--lampara);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Rótulo de fichero de biblioteca: la voz de toda la interfaz utilitaria. */
+.rotulo {
+  font: 600 0.66rem/1 var(--sans);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--tenue);
+}
+
+.columna {
+  max-width: calc(var(--medida) + 6rem);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 6rem;
+}
+
+/* ---------- Cabecera ---------- */
+
+.cabecera {
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--linea);
+}
+
+.cabecera a {
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid transparent;
+}
+
+.cabecera a[aria-current='page'] {
+  color: var(--tinta);
+  border-bottom-color: var(--lampara);
+}
+
+.cabecera a:hover { color: var(--tinta); }
+
+/* ---------- Fila de artículo ---------- */
+
+.fila {
+  display: grid;
+  grid-template-columns: 2px 2.75rem minmax(0, 1fr);
+  gap: 0 1rem;
+  padding: 1.4rem 0;
+  border-bottom: 1px solid var(--linea);
+}
+
+/* La espina: cuánto llevas leído de esto. */
+.espina {
+  align-self: stretch;
+  background: var(--linea);
+  border-radius: 1px;
+}
+
+.espina > i {
+  display: block;
+  height: calc(var(--avance, 0) * 100%);
+  background: var(--lampara);
+  border-radius: 1px;
+}
+
+.coste {
+  padding-top: 0.15rem;
+  text-align: right;
+}
+
+.coste b {
+  display: block;
+  font: 400 1.05rem/1 var(--sans);
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta);
+}
+
+.coste span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.6rem;
+}
+
+.coste.sin-texto b { color: var(--tenue); }
+
+.titulo {
+  margin: 0;
+  font: 500 1.12rem/1.32 var(--serif);
+  letter-spacing: -0.008em;
+}
+
+.titulo a { text-decoration: none; }
+.titulo a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+
+.pista {
+  margin: 0.35rem 0 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+}
+
+.extracto {
+  margin: 0.5rem 0 0;
+  color: var(--tenue);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ---------- Acciones ---------- */
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.8rem;
+}
+
+.acciones button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tenue);
+  cursor: pointer;
+  font: 600 0.66rem/1 var(--sans);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.acciones button:hover:not(:disabled) { color: var(--tinta); }
+.acciones button.destructiva:hover:not(:disabled) { color: var(--peligro); }
+.acciones button:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- Estados de lista ---------- */
+
+.titular {
+  margin: 1.75rem 0 0;
+  font: 400 0.9rem/1 var(--sans);
+  letter-spacing: 0.02em;
+  color: var(--tenue);
+}
+
+.vacio {
+  margin: 3rem 0;
+  max-width: 26rem;
+  color: var(--tenue);
+  font-size: 0.95rem;
+}
+
+.error {
+  color: var(--peligro);
+  font: 0.72rem/1.4 var(--sans);
+}
+
+/* ---------- Lector ---------- */
+
+/* La misma espina, a tamaño de ventana. */
+.rail {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--linea);
+  z-index: 2;
+}
+
+.rail > i {
+  display: block;
+  height: calc(var(--avance, 0) * 100%);
+  background: var(--lampara);
+  transition: height 90ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail > i { transition: none; }
+}
+
+.lector { max-width: var(--medida); }
+
+.volver {
+  display: inline-block;
+  margin-bottom: 2.5rem;
+  text-decoration: none;
+}
+
+.lector h1 {
+  margin: 0;
+  font: 500 1.85rem/1.18 var(--serif);
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+.ficha {
+  margin: 0.9rem 0 0;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--linea);
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+}
+
+.cuerpo {
+  margin-top: 2.25rem;
+  font-size: 1.14rem;
+  line-height: 1.72;
+}
+
+.cuerpo p,
+.cuerpo ul,
+.cuerpo ol,
+.cuerpo dl,
+.cuerpo blockquote,
+.cuerpo pre,
+.cuerpo figure,
+.cuerpo table { margin: 0 0 1.35em; }
+
+.cuerpo > :last-child { margin-bottom: 0; }
+
+.cuerpo h2,
+.cuerpo h3 {
+  margin: 2.2em 0 0.55em;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.cuerpo h2 { font-size: 1.2em; }
+.cuerpo h3 { font-size: 1.05em; }
+
+.cuerpo a {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--tenue);
+}
+
+.cuerpo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+.cuerpo figcaption {
+  margin-top: 0.6rem;
+  color: var(--tenue);
+  font: 0.72rem/1.5 var(--sans);
+  text-align: center;
+}
+
+.cuerpo blockquote {
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--lampara);
+  color: var(--tenue);
+}
+
+.cuerpo pre,
+.cuerpo code { font-family: var(--mono); }
+
+.cuerpo pre {
+  overflow-x: auto;
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--tinta) 6%, transparent);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.cuerpo table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  font: 0.88rem/1.5 var(--sans);
+}
+
+.cuerpo th,
+.cuerpo td {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--linea);
+  text-align: left;
+}
+
+.aviso {
+  margin-top: 2.25rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--linea);
+  color: var(--tenue);
+  font-size: 0.95rem;
+}
+
+.pie {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--linea);
+}
+
+/* ---------- Entrada ---------- */
 
 .entrada {
-  max-width: 20rem;
-  margin: 6rem auto;
+  max-width: 17rem;
+  margin: 22vh auto 0;
   padding: 0 1.25rem;
 }
 
-.entrada label {
-  display: block;
-  color: var(--tenue);
-  font: 0.8rem/1.4 ui-sans-serif, system-ui, sans-serif;
+.entrada h1 {
+  margin: 0 0 2rem;
+  font: 500 1.35rem/1 var(--serif);
+  letter-spacing: -0.01em;
 }
+
+.entrada label { display: block; }
 
 .entrada input {
   display: block;
   width: 100%;
-  margin: 0.4rem 0 1rem;
-  padding: 0.6rem;
-  border: 1px solid var(--borde);
-  border-radius: 0.3rem;
-  background: transparent;
+  margin: 0.5rem 0 1.25rem;
+  padding: 0.5rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--linea);
+  background: none;
   color: inherit;
-  font: inherit;
+  font: 1rem/1.4 var(--serif);
+}
+
+.entrada input:focus {
+  outline: 0;
+  border-bottom-color: var(--lampara);
 }
 
 .entrada button {
-  padding: 0.55rem 1.1rem;
-  border: 1px solid var(--borde);
-  border-radius: 0.3rem;
-  background: transparent;
-  color: inherit;
-  font: 0.9rem/1 ui-sans-serif, system-ui, sans-serif;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tinta);
   cursor: pointer;
+  font: 600 0.66rem/1 var(--sans);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
 }
 
-.error { color: #c0392b; }
+.entrada button:disabled { opacity: 0.45; cursor: default; }
+
+@media (max-width: 30rem) {
+  .columna { padding: 1.5rem 1rem 5rem; }
+  .fila { grid-template-columns: 2px 2.25rem minmax(0, 1fr); gap: 0 0.85rem; }
+  .lector h1 { font-size: 1.55rem; }
+  .cuerpo { font-size: 1.08rem; }
+}

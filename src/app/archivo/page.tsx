@@ -4,20 +4,20 @@ import { listItems } from '@/services/items';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Pendientes() {
-  const items = await listItems({ state: 'pendientes' });
+export default async function Archivo() {
+  const items = await listItems({ state: 'archivo' });
 
   return (
     <main className="columna">
       <Cabecera />
       {items.length === 0 ? (
         <p className="vacio">
-          Aquí no hay nada todavía. Guarda un artículo desde Chrome y aparecerá en esta lista.
+          El archivo está vacío. Lo que archives desde pendientes se guardará aquí.
         </p>
       ) : (
         <>
           <p className="titular">
-            {items.length === 1 ? '1 artículo por leer' : `${items.length} artículos por leer`}
+            {items.length === 1 ? '1 artículo leído' : `${items.length} artículos leídos`}
           </p>
           {items.map((item) => (
             <ItemCard key={item.id} item={item} />

@@ -22,6 +22,8 @@ const BLOQUES = new Set([
   'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'pre', 'td', 'th', 'caption',
 ]);
 
+type Etiqueta = { tagName: string; attribs: Record<string, string> };
+
 function absolutizar(href: string, baseUrl: string): string | null {
   try {
     const resuelta = new URL(href, baseUrl);
@@ -47,7 +49,7 @@ export function sanitizeArticle(dirtyHtml: string, baseUrl: string): SanitizedAr
     allowedSchemes: ['http', 'https', 'mailto'],
     disallowedTagsMode: 'discard',
     transformTags: {
-      a: (_etiqueta, atributos) => {
+      a: (_etiqueta, atributos): Etiqueta => {
         const href = atributos.href ? absolutizar(atributos.href, baseUrl) : null;
         if (!href) return { tagName: 'span', attribs: {} };
         return {
@@ -55,7 +57,7 @@ export function sanitizeArticle(dirtyHtml: string, baseUrl: string): SanitizedAr
           attribs: { href, target: '_blank', rel: 'noopener noreferrer' },
         };
       },
-      img: (_etiqueta, atributos) => {
+      img: (_etiqueta, atributos): Etiqueta => {
         const origen = atributos.src ? absolutizar(atributos.src, baseUrl) : null;
         if (!origen) return { tagName: 'span', attribs: {} };
         return {
