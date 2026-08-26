@@ -15,6 +15,7 @@
     "db:deploy": "DOTENV_CONFIG_PATH=.env.production.local drizzle-kit migrate"
   },
   "dependencies": {
+    "@mozilla/readability": "^0.6.0",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.10",
     "next": "^16.3.3",
@@ -25,12 +26,15 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@types/chrome": "^0.2.7",
     "@types/node": "^26.3.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",
     "@types/sanitize-html": "^2.16.1",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
+    "esbuild": "^0.28.2",
+    "happy-dom": "^20.11.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"
   }
