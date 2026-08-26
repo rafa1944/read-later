@@ -1,12 +1,15 @@
 import { expect, test } from '@playwright/test';
 
-const TITULO = 'Artículo de prueba de extremo a extremo';
+// Título único por test: los ficheros comparten base de datos y dos artículos
+// con el mismo título harían ambiguas las aserciones.
+let TITULO = '';
 
-test.beforeEach(async ({ request }) => {
+test.beforeEach(async ({ request }, info) => {
+  TITULO = `Artículo de prueba ${info.testId}`;
   const respuesta = await request.post('/api/items', {
     headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
     data: {
-      url: `https://ejemplo.com/e2e-${Date.now()}-${Math.random()}`,
+      url: `https://ejemplo.com/e2e-${info.testId}`,
       title: TITULO,
       siteName: 'Ejemplo',
       html: `<p>${'palabra '.repeat(300)}</p>`,

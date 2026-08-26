@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { AjustesLectura } from '@/components/ajustes-lectura';
 import { ItemActions } from '@/components/item-actions';
 import { Rail } from '@/components/scroll-tracker';
 import { MINIMO_PALABRAS_LEGIBLE, fechaCorta, tiempoDeLectura } from '@/lib/formato';
@@ -24,6 +25,7 @@ export default async function Lector({ params }: { params: Promise<{ id: string 
   return (
     <>
       <Rail id={item.id} inicial={item.scrollPct} />
+      <AjustesLectura />
 
       <main className="columna lector">
         <Link href={item.archivedAt ? '/archivo' : '/'} className="volver rotulo">

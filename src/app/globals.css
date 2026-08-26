@@ -428,3 +428,116 @@ a { color: inherit; }
   color: var(--tinta);
   box-shadow: inset 0 -0.35em 0 color-mix(in srgb, var(--lampara) 35%, transparent);
 }
+
+/* ---------- Ajustes de lectura ---------- */
+
+/*
+ * Tema elegido a mano. Estos bloques van después del @media de arriba, así que
+ * ganan aunque el sistema diga otra cosa: es justo lo que se quiere.
+ */
+:root[data-tema='claro'] {
+  color-scheme: light;
+  --fondo: #e9eae5;
+  --tinta: #16181a;
+  --tenue: #62666a;
+  --linea: #d2d4ce;
+  --lampara: #b4761a;
+  --peligro: #a3341f;
+}
+
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+  --fondo: #14171a;
+  --tinta: #e4e2dc;
+  --tenue: #8a8f94;
+  --linea: #262a2e;
+  --lampara: #e0a44b;
+  --peligro: #e07a62;
+}
+
+:root[data-tema='sepia'] {
+  color-scheme: light;
+  --fondo: #efe6d5;
+  --tinta: #2b241a;
+  --tenue: #6e6353;
+  --linea: #ddd0b8;
+  --lampara: #a2661d;
+  --peligro: #97331d;
+}
+
+:root[data-ancho='estrecho'] { --medida: 28rem; }
+:root[data-ancho='ancho'] { --medida: 42rem; }
+
+.cuerpo { font-size: calc(1.14rem * var(--escala, 1)); }
+.lector h1 { font-size: calc(1.85rem * var(--escala, 1)); }
+
+.ajustes {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 3;
+}
+
+.ajustes > button {
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--linea);
+  border-radius: 50%;
+  background: var(--fondo);
+  color: var(--tenue);
+  cursor: pointer;
+  font: 500 0.95rem/1 var(--serif);
+}
+
+.ajustes > button:hover { color: var(--tinta); }
+
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: 3.25rem;
+  width: 15rem;
+  padding: 1.1rem 1.15rem 1.25rem;
+  border: 1px solid var(--linea);
+  background: var(--fondo);
+  box-shadow: 0 6px 28px rgb(0 0 0 / 12%);
+}
+
+.panel fieldset {
+  margin: 0 0 1.1rem;
+  padding: 0;
+  border: 0;
+}
+
+.panel fieldset:last-of-type { margin-bottom: 0; }
+
+.panel legend {
+  padding: 0 0 0.5rem;
+  font: 600 0.62rem/1 var(--sans);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+
+.opciones { display: flex; gap: 0.4rem; }
+
+.opciones button {
+  flex: 1;
+  padding: 0.4rem 0;
+  border: 1px solid var(--linea);
+  background: none;
+  color: var(--tenue);
+  cursor: pointer;
+  font: 0.72rem/1 var(--sans);
+}
+
+.opciones button:hover:not(:disabled) { color: var(--tinta); }
+.opciones button:disabled { opacity: 0.4; cursor: default; }
+
+.opciones button[aria-pressed='true'] {
+  border-color: var(--lampara);
+  color: var(--tinta);
+}
+
+@media (max-width: 30rem) {
+  .panel { width: min(15rem, calc(100vw - 2rem)); }
+}
