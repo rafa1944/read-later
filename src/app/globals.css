@@ -541,3 +541,16 @@ a { color: inherit; }
 @media (max-width: 30rem) {
   .panel { width: min(15rem, calc(100vw - 2rem)); }
 }
+
+.pendiente {
+  color: var(--lampara);
+  font-size: 0.62rem;
+}
+
+.sin-red {
+  margin-left: auto;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--lampara);
+  color: var(--lampara);
+  font-size: 0.6rem;
+}

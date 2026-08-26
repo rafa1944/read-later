@@ -40,6 +40,7 @@
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "esbuild": "^0.28.2",
+    "fake-indexeddb": "^6.2.5",
     "happy-dom": "^20.11.6",
     "typescript": "^7.0.2",
     "vitest": "^4.1.11"

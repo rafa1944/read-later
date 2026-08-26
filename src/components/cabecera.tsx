@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { EstadoRed } from './estado-red';
 
 const ENLACES = [
   { href: '/', texto: 'Pendientes' },
@@ -19,6 +20,7 @@ export function Cabecera() {
           {texto}
         </Link>
       ))}
+      <EstadoRed />
     </header>
   );
 }
