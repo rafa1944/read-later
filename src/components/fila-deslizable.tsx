@@ -59,16 +59,22 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
   }
 
   const activo = desplazamiento >= UMBRAL_DESLIZAR;
+  const progreso = Math.min(1, desplazamiento / UMBRAL_DESLIZAR);
 
   return (
-    <div className="deslizable">
+    <div
+      className="deslizable"
+      style={{
+        ['--desplazamiento' as string]: `${desplazamiento}px`,
+        ['--progreso-gesto' as string]: progreso,
+      }}
+    >
       <span className={activo ? 'accion-gesto lista' : 'accion-gesto'} aria-hidden="true">
         <span className="rotulo">{archivado ? 'Devolver' : 'Archivar'}</span>
       </span>
 
       <div
         className="deslizante"
-        style={{ ['--desplazamiento' as string]: `${desplazamiento}px` }}
         onTouchStart={alEmpezar}
         onTouchMove={alMover}
         onTouchEnd={() => void alSoltar()}

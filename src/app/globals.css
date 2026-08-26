@@ -614,10 +614,16 @@ a { color: inherit; }
   .tiron.recargando > i { animation: none; }
 }
 
-/* Deslizar una fila para archivarla. */
+/*
+ * Deslizar una fila para archivarla.
+ *
+ * Sin overflow:hidden a propósito: en iOS una caja recortada así se considera
+ * contenedor de desplazamiento y se traga el gesto en vez de encadenarlo a la
+ * página, con lo que el dedo sobre una fila no desplazaba la lista. La acción
+ * se oculta con opacidad, que no toca el desplazamiento.
+ */
 .deslizable {
   position: relative;
-  overflow: hidden;
 }
 
 .accion-gesto {
@@ -627,6 +633,7 @@ a { color: inherit; }
   align-items: center;
   padding-right: 1.1rem;
   color: var(--tenue);
+  opacity: var(--progreso-gesto, 0);
 }
 
 .accion-gesto.lista { color: var(--lampara); }
