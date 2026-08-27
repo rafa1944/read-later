@@ -126,14 +126,19 @@ test.describe('lector con el dedo', () => {
 
     await boton.click();
 
-    // Las opciones del panel también se tocan con el dedo.
+    // Las opciones del panel también se tocan con el dedo. Se mira el ancho
+    // además del alto: la fila de cuatro temas es la que antes se estrechaba.
     const pequeñas = await page.evaluate((minimo) =>
       [...document.querySelectorAll('.panel .opciones button')]
         .map((el) => {
           const r = el.getBoundingClientRect();
-          return { texto: el.textContent, alto: Math.round(r.height) };
+          return {
+            texto: el.textContent,
+            ancho: Math.round(r.width),
+            alto: Math.round(r.height),
+          };
         })
-        .filter((m) => m.alto < minimo), MINIMO);
+        .filter((m) => m.alto < minimo || m.ancho < minimo), MINIMO);
 
     expect(pequeñas).toEqual([]);
   });

@@ -6,7 +6,13 @@ loadEnv({ path: '.env.test', override: true });
 export default defineConfig({
   testDir: './e2e',
   globalSetup: './e2e/setup/global.ts',
-  timeout: 30_000,
+  timeout: 60_000,
+  /*
+   * Los cinco segundos de serie se quedan cortos aquí: la app sirve la copia
+   * del service worker y la corrige después, así que lo recién guardado tarda
+   * en aparecer, y con varios navegadores a la vez ese margen se agota.
+   */
+  expect: { timeout: 15_000 },
   use: { baseURL: 'http://localhost:3100' },
   webServer: {
     // next build + start en lugar de next dev: Next no admite dos servidores

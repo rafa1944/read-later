@@ -53,12 +53,18 @@ test('la fila encoge de verdad antes de desaparecer', async ({ page, request }, 
       /archivar/i.test(b.textContent ?? ''),
     ) as HTMLButtonElement;
 
-    const medidas: number[] = [el.getBoundingClientRect().height];
+    const inicial = el.getBoundingClientRect().height;
+    const medidas: number[] = [inicial];
     boton.click();
-    for (let i = 0; i < 10; i += 1) {
+    // El encogimiento no arranca hasta que responde el servidor, así que se
+    // muestrea hasta verlo, no un número fijo de fotogramas: con la máquina
+    // cargada diez no bastaban y la prueba fallaba sin haber nada roto.
+    for (let i = 0; i < 120; i += 1) {
       await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 25)));
       if (!document.body.contains(el)) break;
-      medidas.push(el.getBoundingClientRect().height);
+      const alto = el.getBoundingClientRect().height;
+      medidas.push(alto);
+      if (alto < inicial * 0.6) break;
     }
     return medidas;
   });

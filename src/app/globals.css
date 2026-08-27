@@ -573,15 +573,15 @@ a,
   position: absolute;
   right: 0;
   bottom: 3.25rem;
-  width: 15rem;
-  padding: 1.1rem 1.15rem 1.25rem;
+  width: 19rem;
+  padding: 1.35rem 1.4rem 1.5rem;
   border: 1px solid var(--linea);
   background: var(--fondo);
   box-shadow: 0 6px 28px rgb(0 0 0 / 12%);
 }
 
 .panel fieldset {
-  margin: 0 0 1.1rem;
+  margin: 0 0 1.35rem;
   padding: 0;
   border: 0;
 }
@@ -589,23 +589,24 @@ a,
 .panel fieldset:last-of-type { margin-bottom: 0; }
 
 .panel legend {
-  padding: 0 0 0.5rem;
-  font: 600 0.62rem/1 var(--sans);
+  padding: 0 0 0.6rem;
+  font: 600 0.68rem/1 var(--sans);
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--tenue);
 }
 
-.opciones { display: flex; gap: 0.4rem; }
+.opciones { display: flex; gap: 0.45rem; }
 
 .opciones button {
   flex: 1;
-  padding: 0.4rem 0;
+  min-height: 2.6rem;
+  padding: 0.5rem 0.2rem;
   border: 1px solid var(--linea);
   background: none;
   color: var(--tenue);
   cursor: pointer;
-  font: 0.72rem/1 var(--sans);
+  font: 0.82rem/1.25 var(--sans);
 }
 
 .opciones button:disabled { opacity: 0.4; cursor: default; }
@@ -616,7 +617,7 @@ a,
 }
 
 @media (max-width: 30rem) {
-  .panel { width: min(15rem, calc(100vw - 2rem)); }
+  .panel { width: min(19rem, calc(100vw - 1.5rem)); }
 }
 
 .pendiente {
@@ -971,23 +972,28 @@ a,
   }
 
   .panel {
-    bottom: 4.25rem;
-    width: min(17rem, calc(100vw - 2rem));
-    padding: 1.25rem 1.25rem 1.4rem;
+    bottom: 4.5rem;
+    width: min(23rem, calc(100vw - 1.5rem));
+    padding: 1.5rem 1.5rem 1.65rem;
     /* Con cuatro grupos, en un móvil pequeño en horizontal no cabría. */
-    max-height: calc(100dvh - 7rem);
+    max-height: calc(100dvh - 7.5rem);
     overflow-y: auto;
   }
 
-  .opciones { gap: 0.45rem; }
+  .opciones { gap: 0.5rem; }
 
+  /*
+   * 3.25rem de alto y el ancho que reparte el flex dejan cada botón por encima
+   * de los 44px que pide Apple, incluso en la fila de cuatro temas a 320px.
+   */
   .opciones button {
-    min-height: 2.75rem;
-    font-size: 0.8rem;
+    min-height: 3.25rem;
+    padding: 0.5rem 0.15rem;
+    font-size: 0.92rem;
   }
 
-  .panel legend { padding-bottom: 0.6rem; }
-  .panel fieldset { margin-bottom: 1.25rem; }
+  .panel legend { padding-bottom: 0.7rem; }
+  .panel fieldset { margin-bottom: 1.4rem; }
 }
 
 /* Las muestras de tipografía se escriben con la fuente que ofrecen. */

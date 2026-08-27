@@ -78,8 +78,19 @@ test('una estrella marcada se ve ámbar, no negra', async ({ page, request }, in
   const estrella = page
     .locator('.fila', { hasText: `Ámbar ${info.testId}` })
     .locator('.estrella');
-  await estrella.click();
-  await expect(estrella).toHaveAttribute('aria-pressed', 'true');
+  // Sin esperar al PATCH, la recarga de más abajo puede adelantar al servidor
+  // y encontrarse la estrella todavía sin marcar.
+  const guardado = page.waitForResponse(
+    (r) => r.url().includes('/api/items/') && r.request().method() === 'PATCH',
+  );
+  // Con la máquina cargada la hidratación puede tardar y el primer clic caer
+  // en un botón todavía inerte. Se reintenta, pero solo mientras siga apagada:
+  // volver a pulsar una estrella ya marcada la quitaría.
+  await expect(async () => {
+    if ((await estrella.getAttribute('aria-pressed')) === 'false') await estrella.click();
+    await expect(estrella).toHaveAttribute('aria-pressed', 'true', { timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
+  expect((await guardado).ok()).toBe(true);
 
   // Se espera a que termine la transición de color antes de mirar.
   await page.waitForTimeout(400);
