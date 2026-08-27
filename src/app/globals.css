@@ -729,3 +729,78 @@ a { color: inherit; }
 
 .densidad button[aria-pressed='true'] { color: var(--lampara); }
 
+
+/* ---------- Zonas táctiles ---------- */
+
+/*
+ * Con el dedo, la referencia de iOS son 44×44 puntos y el mínimo de la WCAG
+ * 24×24. Con ratón se mantiene el diseño compacto: la precisión es otra y
+ * agrandarlo allí solo restaría densidad.
+ */
+@media (pointer: coarse) {
+  .cabecera {
+    gap: 0.35rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .cabecera a,
+  .salir {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 0.55rem;
+  }
+
+  /*
+   * El subrayado se dibuja sobre el texto y no en el borde de la caja: al
+   * agrandar la zona táctil, un borde inferior queda colgando muy por debajo
+   * de la palabra y parece un fallo.
+   */
+  .cabecera a[aria-current='page'] {
+    border-bottom: 0;
+    text-decoration: underline;
+    text-decoration-color: var(--lampara);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.45em;
+  }
+
+  .barra-lista { margin-top: 1.25rem; }
+
+  .controles { gap: 0.25rem; }
+
+  .filtro-favoritos,
+  .densidad button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .fila { padding: 1.1rem 0 0.35rem; }
+
+  .acciones {
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+  }
+
+  .acciones button,
+  .estrella {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.6rem;
+    font-size: 0.72rem;
+  }
+
+  /* La estrella es cuadrada: no necesita el relleno lateral del texto. */
+  .estrella { padding: 0; }
+
+  .acciones .pendiente,
+  .acciones .error {
+    align-self: center;
+    padding-left: 0.25rem;
+  }
+
+  /* El aviso de la fila deslizable se aparta de los botones agrandados. */
+  .accion-gesto { padding-right: 0.75rem; }
+}
