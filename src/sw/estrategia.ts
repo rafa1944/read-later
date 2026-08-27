@@ -61,11 +61,3 @@ export function sobrantes(enCache: string[], necesarias: string[]): string[] {
   const conjunto = new Set(necesarias);
   return enCache.filter((clave) => !conjunto.has(clave));
 }
-
-export function urlsDeImagen(html: string, origen: string): string[] {
-  const encontradas = html.match(/\/api\/img\?[^"'\s>]+/g) ?? [];
-  const absolutas = encontradas.map((ruta) =>
-    new URL(ruta.replaceAll('&amp;', '&'), origen).toString(),
-  );
-  return [...new Set(absolutas)];
-}

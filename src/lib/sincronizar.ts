@@ -1,4 +1,4 @@
-import { urlsDeImagen } from '@/sw/estrategia';
+import { urlsDeImagen } from '@/lib/imagenes';
 
 export const MAXIMO_ARTICULOS = 30;
 

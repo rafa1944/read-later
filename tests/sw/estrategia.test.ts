@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  destinoDe as decidir,
-  esCacheFirst,
-  esSWR,
-  sobrantes,
-  urlsDeImagen,
-} from '@/sw/estrategia';
+import { destinoDe as decidir, esCacheFirst, esSWR, sobrantes } from '@/sw/estrategia';
 
 const O = 'https://leer.ejemplo.com';
 
@@ -87,23 +81,5 @@ describe('sobrantes', () => {
 
   it('no devuelve nada si todo sigue haciendo falta', () => {
     expect(sobrantes(['/a/1'], ['/a/1', '/a/2'])).toEqual([]);
-  });
-});
-
-describe('urlsDeImagen', () => {
-  it('saca las imágenes del proxy de un artículo, con las entidades resueltas', () => {
-    const html = '<img src="/api/img?url=https%3A%2F%2Fcdn.com%2Fa.jpg&amp;sig=abc" loading="lazy">';
-    expect(urlsDeImagen(html, O)).toEqual([
-      `${O}/api/img?url=https%3A%2F%2Fcdn.com%2Fa.jpg&sig=abc`,
-    ]);
-  });
-
-  it('no repite la misma imagen', () => {
-    const html = '<img src="/api/img?url=a&amp;sig=1"><img src="/api/img?url=a&amp;sig=1">';
-    expect(urlsDeImagen(html, O).length).toBe(1);
-  });
-
-  it('devuelve vacío si el artículo no lleva imágenes', () => {
-    expect(urlsDeImagen('<p>Solo texto</p>', O)).toEqual([]);
   });
 });

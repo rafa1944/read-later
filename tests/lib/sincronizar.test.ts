@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, expect, it, vi } from 'vitest';
 import { MAXIMO_ARTICULOS, sincronizar } from '@/lib/sincronizar';
 

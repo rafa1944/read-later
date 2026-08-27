@@ -23,7 +23,12 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    /*
+     * suppressHydrationWarning: el guión de más abajo escribe atributos en
+     * <html> antes de que React hidrate, para que no haya fogonazo de color.
+     * React ve entonces atributos que él no puso y avisa; aquí es esperado.
+     */
+    <html lang="es" suppressHydrationWarning>
       <head>
         {/* Antes del primer pintado, para que no haya fogonazo de color. */}
         <script dangerouslySetInnerHTML={{ __html: GUION_INICIAL }} />
