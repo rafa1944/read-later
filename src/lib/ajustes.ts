@@ -55,6 +55,37 @@ export function normalizarAjustes(valor: unknown): Ajustes {
   };
 }
 
+/** El fondo de cada tema, en el mismo orden que las variables del CSS. */
+export const FONDOS: Record<Exclude<Tema, 'auto'>, string> = {
+  claro: '#e9eae5',
+  oscuro: '#14171a',
+  sepia: '#efe6d5',
+};
+
+/**
+ * iOS pinta la franja de la barra de estado con el theme-color. Si no se
+ * actualiza al cambiar de tema, esa franja se queda con el color anterior y se
+ * ve como un recuadro ajeno encima de la app.
+ */
+export function sincronizarColorDeBarra(tema: Tema, doc = document): void {
+  /*
+   * Se edita el contenido, no se recrean las metas: son nodos que React
+   * gestiona, y quitarlos por debajo le rompe la navegación siguiente.
+   *
+   * Se actualizan todas las que haya, porque Next reinserta las suyas al
+   * navegar y no se sabe cuál elegirá el sistema para pintar la franja; si
+   * todas dicen lo mismo, da igual.
+   */
+  for (const meta of doc.querySelectorAll('meta[name="theme-color"]')) {
+    if (tema === 'auto') {
+      const oscura = meta.getAttribute('media')?.includes('dark');
+      meta.setAttribute('content', oscura ? FONDOS.oscuro : FONDOS.claro);
+    } else {
+      meta.setAttribute('content', FONDOS[tema]);
+    }
+  }
+}
+
 export function aplicarAjustes(ajustes: Ajustes, raiz = document.documentElement): void {
   if (ajustes.tema === 'auto') {
     delete raiz.dataset.tema;
@@ -65,6 +96,7 @@ export function aplicarAjustes(ajustes: Ajustes, raiz = document.documentElement
   raiz.dataset.densidad = ajustes.densidad;
   raiz.dataset.letra = ajustes.letra;
   raiz.style.setProperty('--escala', String(ajustes.escala));
+  sincronizarColorDeBarra(ajustes.tema, raiz.ownerDocument);
 }
 
 /**
@@ -80,5 +112,11 @@ try {
   if (a.densidad) r.dataset.densidad = a.densidad;
   if (a.letra) r.dataset.letra = a.letra;
   if (a.escala) r.style.setProperty('--escala', String(a.escala));
+
+  var fondos = { claro: '#e9eae5', oscuro: '#14171a', sepia: '#efe6d5' };
+  if (a.tema && a.tema !== 'auto' && fondos[a.tema]) {
+    var metas = document.querySelectorAll('meta[name="theme-color"]');
+    for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', fondos[a.tema]);
+  }
 } catch (e) {}
 `.trim();

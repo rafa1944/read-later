@@ -101,3 +101,53 @@ test('cambiar la tipografía afecta al cuerpo del artículo y persiste', async (
   await page.getByRole('button', { name: 'Georgia' }).click();
   expect(await cuerpo.evaluate((el) => getComputedStyle(el).fontFamily)).toContain('Georgia');
 });
+
+test('la franja de la barra de estado sigue al tema elegido', async ({ page, request }, info) => {
+  const titulo = `Barra ${info.testId}`;
+  const alta = await request.post('/api/items', {
+    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+    data: {
+      url: `https://ejemplo.com/barra-${info.testId}`,
+      title: titulo,
+      html: `<p>${'palabra '.repeat(300)}</p>`,
+    },
+  });
+  expect(alta.status()).toBe(201);
+
+  await page.goto('/login');
+  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await expect(page.getByRole('link', { name: 'Archivo' })).toBeVisible();
+  await page.getByRole('link', { name: titulo }).first().click();
+
+  /** Todas las metas deben decir lo mismo: no se sabe cuál usará el sistema. */
+  const colores = () =>
+    page
+      .locator('meta[name="theme-color"]')
+      .evaluateAll((metas) => [...new Set(metas.map((m) => m.getAttribute('content')))].sort());
+
+  await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
+  await page.getByRole('button', { name: 'Sepia' }).click();
+
+  /*
+   * iOS pinta con esto la franja del reloj. Si no siguiera al tema, en sepia se
+   * vería un recuadro color papel encima de la app.
+   */
+  expect(await colores()).toEqual(['#efe6d5']);
+
+  // Y sobrevive a la recarga, porque lo aplica también el guión del <head>.
+  await page.reload();
+  expect(await colores()).toEqual(['#efe6d5']);
+
+  // Y a navegar, que es cuando Next reinserta las suyas.
+  await page.getByRole('link', { name: '← Pendientes' }).click();
+  await expect(page.getByRole('link', { name: 'Archivo' })).toBeVisible();
+  expect(await colores()).toEqual(['#efe6d5']);
+
+  // Volver en automático devuelve un color por esquema. Los ajustes viven en el
+  // lector, así que hay que entrar otra vez en el artículo.
+  await page.getByRole('link', { name: titulo }).first().click();
+  await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
+  await page.getByRole('button', { name: 'Auto' }).click();
+  expect(await colores()).toEqual(['#14171a', '#e9eae5']);
+});
