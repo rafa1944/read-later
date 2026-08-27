@@ -19,7 +19,7 @@ export async function PATCH(request: Request, { params }: Contexto): Promise<Res
     return Response.json({ error: 'JSON no válido' }, { status: 400 });
   }
 
-  const permitidos = new Set(['archived', 'scrollPct']);
+  const permitidos = new Set(['archived', 'favorited', 'scrollPct']);
   const desconocidos = Object.keys(cuerpo).filter((clave) => !permitidos.has(clave));
   if (desconocidos.length > 0) {
     return Response.json(
@@ -34,6 +34,12 @@ export async function PATCH(request: Request, { params }: Contexto): Promise<Res
       return Response.json({ error: 'archived debe ser booleano' }, { status: 400 });
     }
     patch.archived = cuerpo.archived;
+  }
+  if ('favorited' in cuerpo) {
+    if (typeof cuerpo.favorited !== 'boolean') {
+      return Response.json({ error: 'favorited debe ser booleano' }, { status: 400 });
+    }
+    patch.favorited = cuerpo.favorited;
   }
   if ('scrollPct' in cuerpo) {
     if (typeof cuerpo.scrollPct !== 'number' || !Number.isFinite(cuerpo.scrollPct)) {

@@ -62,7 +62,7 @@ test('cerrar sesión devuelve al login y deja de dar acceso', async ({ page }) =
   await expect(page.getByRole('link', { name: 'Archivo' })).toBeVisible();
 
   page.once('dialog', (dialogo) => dialogo.accept());
-  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
+  await page.getByRole('button', { name: 'Salir' }).click();
 
   await expect(page).toHaveURL(/\/login/);
 

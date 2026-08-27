@@ -26,6 +26,10 @@ export function cambiarArchivado(id: string, archivar: boolean): Promise<Resulta
   return enviar(id, 'PATCH', { archived: archivar });
 }
 
+export function cambiarFavorito(id: string, favorito: boolean): Promise<Resultado> {
+  return enviar(id, 'PATCH', { favorited: favorito });
+}
+
 export function borrarItem(id: string): Promise<Resultado> {
   return enviar(id, 'DELETE');
 }

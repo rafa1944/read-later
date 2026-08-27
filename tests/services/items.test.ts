@@ -109,3 +109,50 @@ describe('deleteItem', () => {
     expect(await deleteItem(id)).toBe(false);
   });
 });
+
+describe('favoritos', () => {
+  const otro = { ...base, url: 'https://ejemplo.com/otro' };
+
+  it('marca y desmarca', async () => {
+    const { id } = await createItem(base);
+
+    expect((await updateItem(id, { favorited: true }))?.favoritedAt).toBeInstanceOf(Date);
+    expect((await updateItem(id, { favorited: false }))?.favoritedAt).toBeNull();
+  });
+
+  it('repetir el mismo cambio conserva la fecha', async () => {
+    const { id } = await createItem(base);
+    const primera = await updateItem(id, { favorited: true });
+    const segunda = await updateItem(id, { favorited: true });
+
+    expect(segunda?.favoritedAt?.getTime()).toBe(primera?.favoritedAt?.getTime());
+  });
+
+  it('filtra los pendientes por favorito', async () => {
+    const favorito = await createItem(base);
+    await createItem(otro);
+    await updateItem(favorito.id, { favorited: true });
+
+    const filtrados = await listItems({ state: 'pendientes', soloFavoritos: true });
+    expect(filtrados.map((i) => i.id)).toEqual([favorito.id]);
+    expect((await listItems({ state: 'pendientes' })).length).toBe(2);
+  });
+
+  it('un favorito archivado sigue siendo favorito en el archivo', async () => {
+    const { id } = await createItem(base);
+    await updateItem(id, { favorited: true });
+    await updateItem(id, { archived: true });
+
+    expect((await listItems({ state: 'archivo', soloFavoritos: true })).map((i) => i.id)).toEqual([id]);
+    expect(await listItems({ state: 'pendientes', soloFavoritos: true })).toEqual([]);
+  });
+
+  it('archivar no toca el favorito, y viceversa', async () => {
+    const { id } = await createItem(base);
+    await updateItem(id, { favorited: true });
+
+    const tras = await updateItem(id, { archived: true });
+    expect(tras?.favoritedAt).toBeInstanceOf(Date);
+    expect(tras?.archivedAt).toBeInstanceOf(Date);
+  });
+});

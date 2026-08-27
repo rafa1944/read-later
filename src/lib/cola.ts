@@ -34,13 +34,25 @@ async function transaccion<T>(
 }
 
 /**
- * La clave es artículo + método, así que repetir una acción sobre el mismo
- * artículo sustituye a la anterior: gana la última, que es lo que quiere quien
- * la hizo.
+ * La clave es artículo + método. Archivar y marcar favorito son los dos PATCH,
+ * así que los cuerpos se fusionan en lugar de sustituirse: si sin conexión
+ * archivas y además marcas favorito, se envían los dos cambios y no solo el
+ * último. Dentro de un mismo campo sí gana el valor más reciente.
  */
 export async function encolar(accion: Omit<Accion, 'clave'>): Promise<void> {
-  const completa: Accion = { ...accion, clave: `${accion.itemId}:${accion.metodo}` };
-  await transaccion('readwrite', (almacen) => almacen.put(completa));
+  const clave = `${accion.itemId}:${accion.metodo}`;
+  const previa = (await pendientes()).find((a) => a.clave === clave);
+
+  const cuerpo =
+    esObjeto(previa?.cuerpo) && esObjeto(accion.cuerpo)
+      ? { ...previa.cuerpo, ...accion.cuerpo }
+      : (accion.cuerpo ?? previa?.cuerpo);
+
+  await transaccion('readwrite', (almacen) => almacen.put({ ...accion, cuerpo, clave }));
+}
+
+function esObjeto(valor: unknown): valor is Record<string, unknown> {
+  return typeof valor === 'object' && valor !== null && !Array.isArray(valor);
 }
 
 export async function pendientes(): Promise<Accion[]> {

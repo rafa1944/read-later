@@ -1,0 +1,1 @@
+ALTER TABLE "items" ADD COLUMN "favorited_at" timestamp with time zone;

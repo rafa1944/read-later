@@ -27,7 +27,11 @@ export function ItemCard({ item }: { item: ItemSummary }) {
           {[item.siteName, fechaCorta(item.savedAt)].filter(Boolean).join(' · ')}
         </p>
         {item.excerpt && <p className="extracto">{item.excerpt}</p>}
-        <ItemActions id={item.id} archivado={item.archivedAt !== null} />
+        <ItemActions
+          id={item.id}
+          archivado={item.archivedAt !== null}
+          favorito={item.favoritedAt !== null}
+        />
       </div>
     </article>
     </FilaDeslizable>

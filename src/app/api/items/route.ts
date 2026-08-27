@@ -73,6 +73,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const lista = await listItems({
     state,
+    soloFavoritos: searchParams.get('favoritos') === '1',
     limit: Number.isFinite(limite) && limite > 0 ? limite : 50,
     before: before && !Number.isNaN(before.getTime()) ? before : undefined,
   });

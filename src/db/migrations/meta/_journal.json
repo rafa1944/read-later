@@ -8,6 +8,13 @@
       "when": 1787739669081,
       "tag": "0000_hard_tomorrow_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1787832415454,
+      "tag": "0001_complex_namora",
+      "breakpoints": true
     }
   ]
 }

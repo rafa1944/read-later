@@ -14,13 +14,24 @@ describe('cola de acciones', () => {
     expect(cola[0].itemId).toBe('a1');
   });
 
-  it('la última acción sobre el mismo artículo sustituye a la anterior', async () => {
+  it('en un mismo campo gana el valor más reciente', async () => {
     await encolar({ itemId: 'a1', metodo: 'PATCH', cuerpo: { archived: true } });
     await encolar({ itemId: 'a1', metodo: 'PATCH', cuerpo: { archived: false } });
 
     const cola = await pendientes();
     expect(cola.length).toBe(1);
     expect(cola[0].cuerpo).toEqual({ archived: false });
+  });
+
+  it('dos cambios distintos sobre el mismo artículo se fusionan', async () => {
+    // Archivar y marcar favorito son los dos PATCH: sin fusionar, el segundo
+    // pisaría al primero y se perdería un cambio hecho sin conexión.
+    await encolar({ itemId: 'a1', metodo: 'PATCH', cuerpo: { archived: true } });
+    await encolar({ itemId: 'a1', metodo: 'PATCH', cuerpo: { favorited: true } });
+
+    const cola = await pendientes();
+    expect(cola.length).toBe(1);
+    expect(cola[0].cuerpo).toEqual({ archived: true, favorited: true });
   });
 
   it('distingue archivar de borrar sobre el mismo artículo', async () => {

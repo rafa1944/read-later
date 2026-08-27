@@ -31,6 +31,7 @@ export const items = pgTable(
     publishedAt: timestamp('published_at', { withTimezone: true }),
     savedAt: timestamp('saved_at', { withTimezone: true }).notNull().defaultNow(),
     archivedAt: timestamp('archived_at', { withTimezone: true }),
+    favoritedAt: timestamp('favorited_at', { withTimezone: true }),
     scrollPct: real('scroll_pct').notNull().default(0),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
     search: tsvector('search').generatedAlwaysAs(

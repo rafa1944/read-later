@@ -3,10 +3,16 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { borrarItem, cambiarArchivado } from '@/lib/acciones';
+import { Estrella } from './estrella';
 
-type Props = { id: string; archivado: boolean; alBorrar?: 'refrescar' | 'volver' };
+type Props = {
+  id: string;
+  archivado: boolean;
+  favorito: boolean;
+  alBorrar?: 'refrescar' | 'volver';
+};
 
-export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
+export function ItemActions({ id, archivado, favorito, alBorrar = 'refrescar' }: Props) {
   const router = useRouter();
   const [pendiente, iniciar] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +47,7 @@ export function ItemActions({ id, archivado, alBorrar = 'refrescar' }: Props) {
 
   return (
     <div className="acciones">
+      <Estrella id={id} favorito={favorito} />
       <button
         type="button"
         disabled={pendiente || encolada !== null}

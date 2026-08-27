@@ -26,6 +26,7 @@ export type ItemSummary = {
   wordCount: number;
   savedAt: Date;
   archivedAt: Date | null;
+  favoritedAt: Date | null;
   scrollPct: number;
 };
 
@@ -38,11 +39,12 @@ export type ItemDetail = ItemSummary & {
 
 export type ListOptions = {
   state: 'pendientes' | 'archivo';
+  soloFavoritos?: boolean;
   limit?: number;
   before?: Date;
 };
 
-export type ItemPatch = { archived?: boolean; scrollPct?: number };
+export type ItemPatch = { archived?: boolean; favorited?: boolean; scrollPct?: number };
 
 const COLUMNAS_RESUMEN = {
   id: items.id,
@@ -53,6 +55,7 @@ const COLUMNAS_RESUMEN = {
   wordCount: items.wordCount,
   savedAt: items.savedAt,
   archivedAt: items.archivedAt,
+  favoritedAt: items.favoritedAt,
   scrollPct: items.scrollPct,
 };
 
@@ -104,9 +107,12 @@ export async function createItem(input: NewItemInput): Promise<CreateResult> {
 }
 
 export async function listItems(options: ListOptions): Promise<ItemSummary[]> {
-  const estado =
-    options.state === 'archivo' ? isNotNull(items.archivedAt) : isNull(items.archivedAt);
-  const condiciones = options.before ? and(estado, lt(items.savedAt, options.before)) : estado;
+  const filtros = [
+    options.state === 'archivo' ? isNotNull(items.archivedAt) : isNull(items.archivedAt),
+  ];
+  if (options.soloFavoritos) filtros.push(isNotNull(items.favoritedAt));
+  if (options.before) filtros.push(lt(items.savedAt, options.before));
+  const condiciones = and(...filtros);
 
   return db
     .select(COLUMNAS_RESUMEN)
@@ -138,6 +144,18 @@ export async function updateItem(id: string, patch: ItemPatch): Promise<ItemDeta
     } else {
       cambios.archivedAt = null;
     }
+  }
+
+  if (patch.favorited !== undefined) {
+    const [actual] = await db
+      .select({ favoritedAt: items.favoritedAt })
+      .from(items)
+      .where(eq(items.id, id))
+      .limit(1);
+    if (!actual) return null;
+
+    // Idempotente, igual que archivar: repetirlo conserva la fecha original.
+    cambios.favoritedAt = patch.favorited ? (actual.favoritedAt ?? new Date()) : null;
   }
 
   if (patch.scrollPct !== undefined) {

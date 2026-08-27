@@ -182,12 +182,52 @@ a { color: inherit; }
 
 /* ---------- Estados de lista ---------- */
 
+.barra-lista {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .titular {
-  margin: 1.75rem 0 0;
+  margin: 0;
   font: 400 0.9rem/1 var(--sans);
   letter-spacing: 0.02em;
   color: var(--tenue);
 }
+
+.controles {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+}
+
+.filtro-favoritos {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 0.2rem;
+  color: var(--linea);
+}
+
+.filtro-favoritos:hover { color: var(--tenue); }
+.filtro-favoritos.activo { color: var(--lampara); }
+
+.estrella {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--linea);
+  cursor: pointer;
+}
+
+.estrella:hover:not(:disabled) { color: var(--tenue); }
+.estrella.marcada { color: var(--lampara); }
+.estrella:disabled { cursor: default; }
 
 .vacio {
   margin: 3rem 0;
@@ -557,6 +597,7 @@ a { color: inherit; }
 
 .salir {
   margin-left: auto;
+  white-space: nowrap;
   padding: 0;
   border: 0;
   background: none;
@@ -669,7 +710,6 @@ a { color: inherit; }
 .densidad {
   display: flex;
   gap: 0.15rem;
-  margin-left: auto;
 }
 
 .densidad button {
@@ -689,6 +729,3 @@ a { color: inherit; }
 
 .densidad button[aria-pressed='true'] { color: var(--lampara); }
 
-/* Con el control de densidad presente, es él quien empuja a la derecha. */
-.densidad ~ .salir { margin-left: 1.25rem; }
-.sin-red ~ .densidad { margin-left: 0.75rem; }

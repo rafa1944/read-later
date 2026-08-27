@@ -49,7 +49,12 @@ export default async function Lector({ params }: { params: Promise<{ id: string 
         )}
 
         <footer className="pie">
-          <ItemActions id={item.id} archivado={item.archivedAt !== null} alBorrar="volver" />
+          <ItemActions
+            id={item.id}
+            archivado={item.archivedAt !== null}
+            favorito={item.favoritedAt !== null}
+            alBorrar="volver"
+          />
           <p className="pista rotulo" style={{ marginTop: '1rem' }}>
             <a href={item.url} target="_blank" rel="noopener noreferrer">
               Ver el original

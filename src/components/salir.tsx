@@ -30,8 +30,14 @@ export function Salir() {
   }
 
   return (
-    <button type="button" className="salir rotulo" onClick={salir} disabled={saliendo}>
-      {saliendo ? 'Saliendo…' : 'Cerrar sesión'}
+    <button
+      type="button"
+      className="salir rotulo"
+      onClick={salir}
+      disabled={saliendo}
+      title="Cerrar sesión en este dispositivo"
+    >
+      {saliendo ? 'Saliendo…' : 'Salir'}
     </button>
   );
 }
