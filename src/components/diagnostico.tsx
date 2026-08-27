@@ -7,7 +7,7 @@ type Dato = { clave: string; valor: string };
 /**
  * Pantalla de instrumentos. Existe porque desde fuera no se puede ver qué está
  * ejecutando de verdad un iPhone concreto: si la versión que sirve la caché es
- * la actual, cuánto mide su área segura y si el velo superior se está pintando.
+ * la actual, cuánto mide su área segura y dónde cae el borde del contenedor.
  */
 export function Diagnostico() {
   const [datos, setDatos] = useState<Dato[]>([]);
@@ -16,7 +16,6 @@ export function Diagnostico() {
   useEffect(() => {
     async function medir() {
       const raiz = getComputedStyle(document.documentElement);
-      const velo = getComputedStyle(document.body, '::before');
 
       const sonda = document.createElement('div');
       sonda.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px)';
@@ -46,20 +45,17 @@ export function Diagnostico() {
         },
         { clave: 'Barra de estado', valor: barraApple },
         {
-          clave: 'Desfase del marco fijo',
-          valor: raiz.getPropertyValue('--desfase-fijo').trim() || '(sin medir)',
-        },
-        {
-          clave: 'Arriba de la banda',
-          valor: getComputedStyle(document.body, '::before').top,
+          clave: 'Arriba del marco',
+          valor: `${Math.round(
+            document.getElementById('marco')?.getBoundingClientRect().top ?? -1,
+          )} px`,
         },
         { clave: 'theme-color', valor: metaTema },
-        { clave: 'Alto del velo', valor: velo.height },
-        { clave: 'Velo: parada opaca', valor: velo.backgroundImage.slice(0, 120) },
-        { clave: 'Capa del velo', valor: velo.zIndex },
         {
-          clave: 'Franja opaca',
-          valor: raiz.getPropertyValue('--velo-solido').trim() || '(sin definir)',
+          clave: 'Alto del marco',
+          valor: `${Math.round(
+            document.getElementById('marco')?.getBoundingClientRect().height ?? -1,
+          )} px`,
         },
         {
           clave: 'Relleno del contenido',

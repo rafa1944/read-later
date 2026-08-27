@@ -1,8 +1,7 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { CLAVE_AJUSTES, normalizarAjustes, sincronizarColorDeBarra } from '@/lib/ajustes';
 import { debeRefrescar } from '@/lib/refresco';
 import { EVENTO_SINCRONIZAR } from './sincronizador';
 
@@ -13,22 +12,7 @@ import { EVENTO_SINCRONIZAR } from './sincronizador';
  */
 export function Actualizador() {
   const router = useRouter();
-  const ruta = usePathname();
   const ultimo = useRef(0);
-
-  /*
-   * El color de la barra de estado se reafirma en cada navegación: Next vuelve
-   * a insertar sus propias metas y, sin esto, la franja del reloj se quedaría
-   * con el color del tema anterior.
-   */
-  useEffect(() => {
-    try {
-      const ajustes = normalizarAjustes(JSON.parse(localStorage.getItem(CLAVE_AJUSTES) ?? 'null'));
-      sincronizarColorDeBarra(ajustes.tema);
-    } catch {
-      // Sin ajustes guardados, las metas del servidor ya son correctas.
-    }
-  }, [ruta]);
 
   useEffect(() => {
     function refrescar(forzar = false) {

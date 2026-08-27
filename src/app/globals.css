@@ -15,16 +15,6 @@
 
   --medida: 34rem;
 
-  /*
-   * Banda opaca que oculta el texto al pasar bajo el reloj, más un
-   * desvanecimiento por debajo para que la desaparición no sea un corte seco.
-   *
-   * El mínimo de 3,75 rem son los ~60 px de la barra de estado de un iPhone con
-   * isla dinámica, y cubre el caso de Safari, donde el área segura devuelve 0
-   * aunque el contenido sí pase bajo el reloj.
-   */
-  --velo-solido: max(3.75rem, env(safe-area-inset-top, 0px));
-  --velo-fundido: 2rem;
 
   --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -109,8 +99,7 @@ a,
   max-width: calc(var(--medida) + 6rem);
   margin: 0 auto;
   /* En un móvil con muesca, sin esto el contenido nace bajo el reloj. */
-  /* Donde acaba el velo, pero sin bajar del margen cómodo de siempre. */
-  padding: max(2rem, calc(var(--velo-solido) + var(--velo-fundido))) 1.25rem 6rem;
+  padding: 2rem 1.25rem 6rem;
   padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
 }
 
@@ -478,7 +467,7 @@ a,
 .entrada button:disabled { opacity: 0.45; cursor: default; }
 
 @media (max-width: 30rem) {
-  .columna { padding: max(1.5rem, calc(var(--velo-solido) + var(--velo-fundido))) 1rem 5rem; }
+  .columna { padding: 1.5rem 1rem 5rem; }
   .fila { grid-template-columns: 2px 2.25rem minmax(0, 1fr); gap: 0 0.85rem; }
   .lector h1 { font-size: 1.55rem; }
   .cuerpo { font-size: 1.08rem; }

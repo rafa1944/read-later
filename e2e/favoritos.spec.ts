@@ -47,8 +47,18 @@ test('un favorito archivado se encuentra en el archivo', async ({ page, request 
   await entrar(page);
 
   const fila = page.locator('.fila', { hasText: titulo });
+
+  /*
+   * La estrella se pinta al instante, antes de que responda el servidor, así
+   * que verla encendida no demuestra que el favorito esté guardado. Se espera
+   * a la respuesta o el archivado siguiente puede adelantarla.
+   */
+  const guardado = page.waitForResponse(
+    (r) => r.url().includes('/api/items/') && r.request().method() === 'PATCH',
+  );
   await fila.getByRole('button', { name: 'Marcar como favorito' }).click();
-  await expect(fila.getByRole('button', { name: 'Quitar de favoritos' })).toBeVisible();
+  expect((await guardado).ok()).toBe(true);
+
   await fila.getByRole('button', { name: 'Archivar' }).click();
   await expect(page.getByRole('link', { name: titulo })).toHaveCount(0);
 
