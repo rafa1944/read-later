@@ -18,11 +18,14 @@
   /*
    * Franja superior tapada.
    *
-   * En Safari como navegador la barra se esconde al desplazarse y el contenido
-   * pasa bajo el reloj, pero env(safe-area-inset-top) vale 0: hace falta un
-   * mínimo propio de 3rem para taparlo.
+   * Medido en un iPhone con isla dinámica: el contenido pasa bajo el reloj
+   * tanto en Safari como en la app instalada, y en los dos casos
+   * env(safe-area-inset-top) devuelve 0. No se puede confiar en él, así que la
+   * franja tiene altura propia: 3,75 rem son los ~60 px que ocupa la barra de
+   * estado de los iPhone actuales. Si algún día el sistema declara un área
+   * segura mayor, el max() la respeta.
    */
-  --velo-solido: max(3rem, env(safe-area-inset-top, 0px));
+  --velo-solido: max(3.75rem, env(safe-area-inset-top, 0px));
   --velo-fundido: 2rem;
 
   --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
@@ -38,20 +41,6 @@
     --linea: #262a2e;
     --lampara: #e0a44b;
     --peligro: #e07a62;
-  }
-}
-
-/*
- * En la app instalada, iOS con la barra de estado en «default» se reserva esa
- * franja y no se la cede a la web: la ventana mide unos 62 px menos que la
- * pantalla y el área segura vale 0. Ahí el contenido no puede pasar bajo el
- * reloj, así que reservarle sitio solo dejaba un hueco vacío. El velo se queda
- * en un desvanecimiento breve, y si algún día iOS cede la franja, el área
- * segura deja de ser 0 y esto se adapta solo.
- */
-@media (display-mode: standalone) {
-  :root {
-    --velo-solido: env(safe-area-inset-top, 0px);
   }
 }
 
