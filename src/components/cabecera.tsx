@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ControlDensidad } from './densidad';
 import { EstadoRed } from './estado-red';
 import { Salir } from './salir';
 
@@ -29,6 +30,7 @@ export function Cabecera() {
         </Link>
       ))}
       <EstadoRed />
+      <ControlDensidad />
       <Salir />
     </header>
   );

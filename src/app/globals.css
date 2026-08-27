@@ -650,3 +650,45 @@ a { color: inherit; }
   .accion-gesto { display: none; }
 }
 
+
+/* ---------- Densidad de la lista ---------- */
+
+/*
+ * Se resuelve en CSS y no en React: el atributo lo escribe el guión del <head>
+ * antes del primer pintado, así que no se ven los resúmenes aparecer y
+ * desvanecerse al cargar, y cambiarlo no pide nada al servidor.
+ */
+:root[data-densidad='compacta'] .extracto {
+  display: none;
+}
+
+:root[data-densidad='compacta'] .fila {
+  padding: 1rem 0;
+}
+
+.densidad {
+  display: flex;
+  gap: 0.15rem;
+  margin-left: auto;
+}
+
+.densidad button {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.2rem;
+  background: none;
+  color: var(--linea);
+  cursor: pointer;
+}
+
+.densidad button:hover { color: var(--tenue); }
+
+.densidad button[aria-pressed='true'] { color: var(--lampara); }
+
+/* Con el control de densidad presente, es él quien empuja a la derecha. */
+.densidad ~ .salir { margin-left: 1.25rem; }
+.sin-red ~ .densidad { margin-left: 0.75rem; }

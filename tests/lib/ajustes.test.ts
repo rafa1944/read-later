@@ -4,7 +4,12 @@ import { AJUSTES_POR_DEFECTO, aplicarAjustes, normalizarAjustes } from '@/lib/aj
 
 describe('normalizarAjustes', () => {
   it('acepta unos ajustes válidos', () => {
-    const ajustes = { escala: 1.2, ancho: 'ancho' as const, tema: 'sepia' as const };
+    const ajustes = {
+      escala: 1.2,
+      ancho: 'ancho' as const,
+      tema: 'sepia' as const,
+      densidad: 'compacta' as const,
+    };
     expect(normalizarAjustes(ajustes)).toEqual(ajustes);
   });
 
@@ -23,7 +28,7 @@ describe('normalizarAjustes', () => {
 describe('aplicarAjustes', () => {
   it('escribe los atributos y la variable de escala en la raíz', () => {
     const raiz = document.documentElement;
-    aplicarAjustes({ escala: 1.15, ancho: 'ancho', tema: 'oscuro' }, raiz);
+    aplicarAjustes({ escala: 1.15, ancho: 'ancho', tema: 'oscuro', densidad: 'completa' }, raiz);
 
     expect(raiz.dataset.tema).toBe('oscuro');
     expect(raiz.dataset.ancho).toBe('ancho');
@@ -32,8 +37,43 @@ describe('aplicarAjustes', () => {
 
   it('con tema automático no fija ningún tema, para dejar mandar al sistema', () => {
     const raiz = document.documentElement;
-    aplicarAjustes({ escala: 1, ancho: 'medio', tema: 'auto' }, raiz);
+    aplicarAjustes({ escala: 1, ancho: 'medio', tema: 'auto', densidad: 'completa' }, raiz);
 
     expect(raiz.dataset.tema).toBeUndefined();
+  });
+});
+
+describe('densidad de la lista', () => {
+  it('por defecto se muestra el resumen', () => {
+    expect(AJUSTES_POR_DEFECTO.densidad).toBe('completa');
+  });
+
+  it('acepta la densidad compacta', () => {
+    expect(normalizarAjustes({ ...AJUSTES_POR_DEFECTO, densidad: 'compacta' }).densidad).toBe(
+      'compacta',
+    );
+  });
+
+  it('unos ajustes guardados antes de que existiera la densidad siguen valiendo', () => {
+    // Es lo que hay en el localStorage de quien ya usaba la app: no se puede
+    // descartar todo por un campo que no existía.
+    const antiguos = { escala: 1.3, ancho: 'ancho' as const, tema: 'sepia' as const };
+    const normalizados = normalizarAjustes(antiguos);
+
+    expect(normalizados.escala).toBeCloseTo(1.3, 5);
+    expect(normalizados.tema).toBe('sepia');
+    expect(normalizados.densidad).toBe('completa');
+  });
+
+  it('una densidad inventada cae en el valor por defecto sin tirar el resto', () => {
+    const normalizados = normalizarAjustes({ ...AJUSTES_POR_DEFECTO, densidad: 'gaseosa', tema: 'oscuro' });
+
+    expect(normalizados.densidad).toBe('completa');
+    expect(normalizados.tema).toBe('oscuro');
+  });
+
+  it('escribe la densidad en la raíz', () => {
+    aplicarAjustes({ ...AJUSTES_POR_DEFECTO, densidad: 'compacta' }, document.documentElement);
+    expect(document.documentElement.dataset.densidad).toBe('compacta');
   });
 });
