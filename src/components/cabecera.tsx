@@ -17,7 +17,14 @@ export function Cabecera() {
   return (
     <header className="cabecera rotulo">
       {ENLACES.map(({ href, texto }) => (
-        <Link key={href} href={href} aria-current={ruta === href ? 'page' : undefined}>
+        // prefetch completo: son tres rutas y siempre están a la vista, así
+        // que al pulsar ya está descargada.
+        <Link
+          key={href}
+          href={href}
+          prefetch
+          aria-current={ruta === href ? 'page' : undefined}
+        >
           {texto}
         </Link>
       ))}
