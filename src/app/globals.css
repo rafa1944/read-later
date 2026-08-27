@@ -45,6 +45,17 @@ body {
 
 a { color: inherit; }
 
+/*
+ * El navegador pinta por su cuenta un velo negro al 18 % sobre lo que tocas.
+ * Se quita y se sustituye por una respuesta propia en :active, para que el
+ * toque siga confirmándose pero sin el fogonazo oscuro.
+ */
+button,
+a,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
 :focus-visible {
   outline: 2px solid var(--lampara);
   outline-offset: 2px;
@@ -225,9 +236,17 @@ a { color: inherit; }
   cursor: pointer;
 }
 
-.estrella:hover:not(:disabled) { color: var(--tenue); }
+.estrella:hover { color: var(--tenue); }
 .estrella.marcada { color: var(--lampara); }
-.estrella:disabled { cursor: default; }
+.estrella:active { transform: scale(0.86); }
+
+/* El cambio de color se acompaña, no salta. */
+.estrella { transition: color 130ms ease, transform 90ms ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .estrella { transition: none; }
+  .estrella:active { transform: none; }
+}
 
 .vacio {
   margin: 3rem 0;

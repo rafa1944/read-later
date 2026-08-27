@@ -5,6 +5,7 @@ loadEnv({ path: '.env.test', override: true });
 
 export default defineConfig({
   testDir: './e2e',
+  globalSetup: './e2e/setup/global.ts',
   timeout: 30_000,
   use: { baseURL: 'http://localhost:3100' },
   webServer: {

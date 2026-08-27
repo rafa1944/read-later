@@ -26,7 +26,9 @@ npm run test:e2e       # navegador, con Playwright, sobre una compilación de pr
 ```
 
 Las pruebas usan la base `readlater_test`, que crea el contenedor al arrancar
-por primera vez. La suite de Vitest aplica las migraciones sola.
+por primera vez. Vitest aplica las migraciones solo, y Playwright vacía la base
+antes de cada ejecución, así que las dos suites se pueden repetir sin preparar
+nada a mano.
 
 ## Guardar un artículo sin la extensión
 

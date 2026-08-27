@@ -1,14 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { cambiarFavorito } from '@/lib/acciones';
 
 type Props = { id: string; favorito: boolean };
 
 export function Estrella({ id, favorito }: Props) {
   const router = useRouter();
-  const [pendiente, iniciar] = useTransition();
   // Se pinta el estado deseado al instante: esperar a la red para ver la
   // estrella encenderse hace que el toque parezca que no ha funcionado.
   const [marcado, setMarcado] = useState(favorito);
@@ -22,14 +21,19 @@ export function Estrella({ id, favorito }: Props) {
       setMarcado(!deseado);
       return;
     }
-    if (resultado === 'ok') iniciar(() => router.refresh());
+    if (resultado === 'ok') router.refresh();
   }
 
+  /*
+   * A propósito nunca se deshabilita mientras se refresca: atenuarla medio
+   * segundo después de haberla encendido parecía un fallo. Volver a pulsarla
+   * es inofensivo, porque marcar favorito es idempotente y la cola sin
+   * conexión fusiona los cambios.
+   */
   return (
     <button
       type="button"
       className={marcado ? 'estrella marcada' : 'estrella'}
-      disabled={pendiente}
       onClick={() => void alternar()}
       aria-pressed={marcado}
       aria-label={marcado ? 'Quitar de favoritos' : 'Marcar como favorito'}
