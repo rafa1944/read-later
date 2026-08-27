@@ -265,8 +265,8 @@ a,
 .filtro-favoritos {
   display: grid;
   place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 0.2rem;
   color: var(--tenue);
 }
@@ -808,8 +808,8 @@ a,
 .densidad button {
   display: grid;
   place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.25rem;
+  height: 2.25rem;
   padding: 0;
   border: 0;
   border-radius: 0.2rem;
@@ -835,12 +835,22 @@ a,
     padding-bottom: 0.75rem;
   }
 
+  /*
+   * Los cuatro van justos en una línea de 375 px. Para que quepan más grandes
+   * se recorta el espaciado entre letras, que es lo que más ocupa en un rótulo
+   * en versales, y el relleno lateral: la altura de toque no se toca.
+   */
+  .cabecera {
+    font-size: 0.82rem;
+    letter-spacing: 0.07em;
+  }
+
   .cabecera a,
   .salir {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    padding: 0 0.55rem;
+    padding: 0 0.3rem;
   }
 
   /*
@@ -886,6 +896,18 @@ a,
 
   /* La estrella es cuadrada: no necesita el relleno lateral del texto. */
   .estrella { padding: 0; }
+
+  /* Por debajo de 352 px los cuatro ya no caben a este tamaño y 'Salir' se
+     corta por la derecha, así que ahí se cede y vuelven a encoger. */
+  @media (max-width: 22rem) {
+    .cabecera {
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+    }
+
+    .cabecera a,
+    .salir { padding: 0 0.2rem; }
+  }
 
   .acciones .pendiente,
   .acciones .error {
