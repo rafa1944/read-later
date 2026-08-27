@@ -55,6 +55,24 @@ test.describe('con el dedo', () => {
     expect(pequeños, `controles por debajo de ${MINIMO}px`).toEqual([]);
   });
 
+  test('la cabecera cabe en una línea sin que Salir se salga', async ({
+    page,
+    request,
+  }, info) => {
+    await entrarConArticulo(page, request, info.testId);
+
+    // En 375 px los cuatro enlaces van justos: agrandar la letra los desborda
+    // y 'Salir' se pierde por la derecha sin que nada más lo delate.
+    const cabecera = await page.locator('.cabecera').evaluate((el) => ({
+      contenido: el.scrollWidth,
+      disponible: el.clientWidth,
+    }));
+    expect(cabecera.contenido).toBeLessThanOrEqual(cabecera.disponible);
+
+    const salir = (await page.getByRole('button', { name: 'Salir' }).boundingBox())!;
+    expect(salir.x + salir.width).toBeLessThanOrEqual(375);
+  });
+
   test('los controles de una fila no se solapan entre sí', async ({ page, request }, info) => {
     await entrarConArticulo(page, request, info.testId);
 

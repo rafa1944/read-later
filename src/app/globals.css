@@ -103,6 +103,15 @@ a,
   padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
 }
 
+/*
+ * En una pantalla de escritorio la lista se queda en una tira estrecha con
+ * medio monitor vacío al lado. Se ensancha, pero solo la lista: el ancho del
+ * lector es una decisión de lectura y la toma quien lee, en sus ajustes.
+ */
+@media (min-width: 64rem) {
+  .columna:not(.lector) { max-width: 56rem; }
+}
+
 /* ---------- Cabecera ---------- */
 
 .cabecera {
@@ -111,6 +120,19 @@ a,
   align-items: baseline;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid var(--linea);
+}
+
+/*
+ * El rótulo general es menudo a propósito, pero esto son los enlaces por los
+ * que se anda por la app y conviene leerlos de un vistazo. Solo a partir de
+ * una pantalla de tableta: en un móvil de 375 px los cuatro no caben en una
+ * línea ni un punto más grandes, y 'Salir' se sale por la derecha.
+ */
+@media (min-width: 34rem) {
+  .cabecera {
+    gap: 1.75rem;
+    font-size: 0.82rem;
+  }
 }
 
 .cabecera a {
@@ -514,12 +536,16 @@ a,
  * Tema elegido a mano. Estos bloques van después del @media de arriba, así que
  * ganan aunque el sistema diga otra cosa: es justo lo que se quiere.
  */
+/*
+ * Blanco de verdad, no el papel templado de 'auto'. Quien elige 'claro' a mano
+ * suele venir buscando justo eso, y así los cuatro temas se distinguen entre sí.
+ */
 :root[data-tema='claro'] {
   color-scheme: light;
-  --fondo: #e9eae5;
+  --fondo: #ffffff;
   --tinta: #16181a;
-  --tenue: #62666a;
-  --linea: #d2d4ce;
+  --tenue: #5c6064;
+  --linea: #e4e4e2;
   --lampara: #b4761a;
   --peligro: #a3341f;
 }
@@ -575,7 +601,11 @@ a,
   bottom: 3.25rem;
   width: 19rem;
   padding: 1.35rem 1.4rem 1.5rem;
-  border: 1px solid var(--linea);
+  /*
+   * El panel comparte fondo con la página: si el borde es el mismo hilo que
+   * separa las filas, el cuadro no se distingue de lo que hay detrás.
+   */
+  border: 1px solid color-mix(in srgb, var(--tenue) 50%, var(--linea));
   background: var(--fondo);
   box-shadow: 0 6px 28px rgb(0 0 0 / 12%);
 }
@@ -975,6 +1005,10 @@ a,
     bottom: 4.5rem;
     width: min(23rem, calc(100vw - 1.5rem));
     padding: 1.5rem 1.5rem 1.65rem;
+    /* Con el dedo encima hace falta ver dónde acaba el cuadro y empieza la
+       página, así que aquí el borde va a tinta tenue y la sombra más honda. */
+    border-color: var(--tenue);
+    box-shadow: 0 10px 40px rgb(0 0 0 / 26%);
     /* Con cuatro grupos, en un móvil pequeño en horizontal no cabría. */
     max-height: calc(100dvh - 7.5rem);
     overflow-y: auto;
