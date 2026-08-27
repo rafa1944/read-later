@@ -30,8 +30,18 @@ test('el velo superior cubre el contenido pero no captura los toques', async ({
       toques: e.pointerEvents,
       capa: Number(e.zIndex),
       fondo: e.backgroundImage,
+      alto: Number.parseFloat(e.height),
     };
   });
+
+  /*
+   * En Safari como navegador env(safe-area-inset-top) vale 0, y el contenido
+   * pasa igualmente bajo el reloj al desplazarse. Atado solo al área segura, el
+   * velo se quedaba en 44 px con 8 opacos y el texto se leía detrás de la hora.
+   * La barra de estado de un iPhone ronda los 44-54 px: el velo tiene que
+   * cubrirla con holgura por sí mismo.
+   */
+  expect(velo.alto, 'alto del velo sin área segura').toBeGreaterThanOrEqual(76);
 
   expect(velo.existe).toBe(true);
   expect(velo.posicion).toBe('fixed');

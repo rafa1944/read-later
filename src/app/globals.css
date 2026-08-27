@@ -15,6 +15,14 @@
 
   --medida: 34rem;
 
+  /*
+   * Franja superior tapada. En la app instalada equivale al área segura, pero
+   * en Safari como navegador env(safe-area-inset-top) vale 0 y el contenido
+   * pasa igualmente bajo el reloj al desplazarse: de ahí el mínimo de 3rem.
+   */
+  --velo-solido: max(3rem, env(safe-area-inset-top, 0px));
+  --velo-fundido: 2rem;
+
   --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
@@ -42,16 +50,11 @@ body::before {
   content: '';
   position: fixed;
   inset: 0 0 auto 0;
-  height: calc(env(safe-area-inset-top, 0px) + 2.75rem);
-  /*
-   * Sólido durante toda el área segura y 0,5 rem más, y solo entonces se
-   * desvanece. Repartir el degradado por toda la banda dejaba el velo casi
-   * transparente justo a la altura del reloj, que es donde más se nota.
-   */
+  height: calc(var(--velo-solido) + var(--velo-fundido));
   background: linear-gradient(
     to bottom,
     var(--fondo) 0,
-    var(--fondo) calc(100% - 2.25rem),
+    var(--fondo) var(--velo-solido),
     transparent 100%
   );
   pointer-events: none;
@@ -100,7 +103,8 @@ a,
   max-width: calc(var(--medida) + 6rem);
   margin: 0 auto;
   /* En un móvil con muesca, sin esto el contenido nace bajo el reloj. */
-  padding: calc(env(safe-area-inset-top, 0px) + 2rem) 1.25rem 6rem;
+  /* El contenido empieza donde acaba el velo, para que nada nazca velado. */
+  padding: calc(var(--velo-solido) + var(--velo-fundido)) 1.25rem 6rem;
   padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
 }
 
@@ -468,7 +472,7 @@ a,
 .entrada button:disabled { opacity: 0.45; cursor: default; }
 
 @media (max-width: 30rem) {
-  .columna { padding: calc(env(safe-area-inset-top, 0px) + 1.25rem) 1rem 5rem; }
+  .columna { padding: calc(var(--velo-solido) + var(--velo-fundido)) 1rem 5rem; }
   .fila { grid-template-columns: 2px 2.25rem minmax(0, 1fr); gap: 0 0.85rem; }
   .lector h1 { font-size: 1.55rem; }
   .cuerpo { font-size: 1.08rem; }

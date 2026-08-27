@@ -32,7 +32,16 @@ export function Diagnostico() {
         { clave: 'Alto del velo', valor: velo.height },
         { clave: 'Velo: parada opaca', valor: velo.backgroundImage.slice(0, 120) },
         { clave: 'Capa del velo', valor: velo.zIndex },
-        { clave: 'Relleno superior', valor: getComputedStyle(document.body).paddingTop },
+        {
+          clave: 'Franja opaca',
+          valor: raiz.getPropertyValue('--velo-solido').trim() || '(sin definir)',
+        },
+        {
+          clave: 'Relleno del contenido',
+          valor: document.querySelector('.columna')
+            ? getComputedStyle(document.querySelector('.columna')!).paddingTop
+            : '(sin columna)',
+        },
         { clave: 'Modo de pantalla', valor: matchMedia('(display-mode: standalone)').matches ? 'app instalada' : 'navegador' },
         { clave: 'Service worker', valor: navigator.serviceWorker?.controller ? 'controlando' : 'sin control' },
         { clave: 'Ámbito del worker', valor: registro?.scope ?? '(ninguno)' },
