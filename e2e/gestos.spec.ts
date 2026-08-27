@@ -139,3 +139,79 @@ test('un desplazamiento vertical sobre una fila no la archiva', async ({ page, r
   await page.waitForTimeout(600);
   await expect(page.getByRole('link', { name: titulo })).toBeVisible();
 });
+
+/** Extrae el desplazamiento horizontal de la matriz de transformación. */
+const DESPLAZAMIENTO_EN_PAGINA = `(el) => {
+  const m = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+  return m.m41;
+}`;
+
+test('al soltar, la fila vuelve con animación y no de golpe', async ({ page, request }, info) => {
+  const titulo = `Vuelta ${info.testId}`;
+  await request.post('/api/items', {
+    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+    data: {
+      url: `https://ejemplo.com/vuelta-${info.testId}`,
+      title: titulo,
+      html: `<p>${'palabra '.repeat(250)}</p>`,
+    },
+  });
+
+  await entrar(page);
+  const deslizante = page.locator('.fila', { hasText: titulo }).locator('..');
+  await expect(deslizante).toBeVisible();
+
+  /*
+   * El arrastre y el muestreo van dentro de la página: medir desde fuera
+   * introduce latencia de protocolo y se perdería justo la parte interesante,
+   * que son los primeros fotogramas tras soltar.
+   */
+  const traza = await deslizante.evaluate(async (el) => {
+    const tx = () => new DOMMatrixReadOnly(getComputedStyle(el).transform).m41;
+
+    const toque = (x: number, y: number) =>
+      new Touch({ identifier: 1, target: el, clientX: x, clientY: y });
+    const lanzar = (tipo: string, x: number, y: number) => {
+      const t = toque(x, y);
+      el.dispatchEvent(
+        new TouchEvent(tipo, {
+          touches: tipo === 'touchend' ? [] : [t],
+          changedTouches: [t],
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    };
+
+    const caja = el.getBoundingClientRect();
+    const y = caja.y + caja.height / 2;
+    const desde = caja.x + caja.width - 20;
+
+    lanzar('touchstart', desde, y);
+    for (let paso = 1; paso <= 8; paso += 1) {
+      lanzar('touchmove', desde - (110 * paso) / 8, y);
+      await new Promise((r) => setTimeout(r, 16));
+    }
+
+    const arrastrado = tx();
+    lanzar('touchend', desde - 110, y);
+
+    const vuelta: number[] = [];
+    for (let i = 0; i < 12; i += 1) {
+      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 20)));
+      if (!document.body.contains(el)) break;
+      vuelta.push(tx());
+    }
+    return { arrastrado, vuelta };
+  });
+
+  // El dedo lo movió de verdad hacia la izquierda.
+  expect(traza.arrastrado).toBeLessThan(-40);
+
+  // Y al soltar pasa por posiciones intermedias en lugar de saltar a su sitio.
+  const intermedias = traza.vuelta.filter((x) => x < -1 && x > traza.arrastrado + 1);
+  expect(
+    intermedias.length,
+    `desplazamientos observados tras soltar: ${traza.vuelta.map((x) => Math.round(x)).join(', ')}`,
+  ).toBeGreaterThan(0);
+});

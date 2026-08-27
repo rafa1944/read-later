@@ -9,6 +9,7 @@ import { UMBRAL_DESLIZAR, amortiguar, decidirEje, type Eje } from '@/lib/gestos'
 
 const MAXIMO = 120;
 export const DURACION_SALIDA_MS = 240;
+export const DURACION_RETORNO_MS = 220;
 
 type Props = { id: string; archivado: boolean; children: React.ReactNode };
 
@@ -22,6 +23,7 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
   const [desplazamiento, setDesplazamiento] = useState(0);
   const [encolada, setEncolada] = useState(false);
   const [saliendo, setSaliendo] = useState(false);
+  const [volviendo, setVolviendo] = useState(false);
   const [, iniciar] = useTransition();
 
   /*
@@ -43,6 +45,9 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
 
   function alEmpezar(evento: React.TouchEvent) {
     if (evento.touches.length !== 1) return;
+    // Si venía volviendo, se corta: durante el arrastre la fila tiene que
+    // seguir al dedo uno a uno, sin transición de por medio.
+    setVolviendo(false);
     const dedo = evento.touches[0];
     inicio.current = { x: dedo.clientX, y: dedo.clientY };
     eje.current = 'indeciso';
@@ -64,6 +69,17 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
   async function alSoltar() {
     const recorrido = desplazamiento;
     inicio.current = null;
+    if (recorrido === 0) return;
+
+    /*
+     * La transición se enciende justo para el regreso y se apaga después. Con
+     * ella puesta siempre, la fila iría por detrás del dedo al arrastrar.
+     */
+    const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!sinMovimiento) {
+      setVolviendo(true);
+      setTimeout(() => setVolviendo(false), DURACION_RETORNO_MS);
+    }
     setDesplazamiento(0);
 
     if (recorrido < UMBRAL_DESLIZAR) return;
@@ -103,7 +119,7 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
           </span>
 
           <div
-            className="deslizante"
+            className={volviendo ? 'deslizante volviendo' : 'deslizante'}
             onTouchStart={alEmpezar}
             onTouchMove={alMover}
             onTouchEnd={() => void alSoltar()}

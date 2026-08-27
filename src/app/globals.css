@@ -894,3 +894,16 @@ a,
 @media (prefers-reduced-motion: reduce) {
   .aviso-flotante { animation: none; }
 }
+
+/*
+ * El regreso de la fila tras soltarla. La transición no está siempre puesta:
+ * durante el arrastre la fila debe seguir al dedo sin retraso, así que solo se
+ * activa mientras vuelve.
+ */
+.deslizante.volviendo {
+  transition: transform 220ms cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deslizante.volviendo { transition: none; }
+}
