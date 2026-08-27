@@ -81,6 +81,10 @@ El service worker se compila desde `src/sw/` a `public/sw.js`; `npm run dev` y
 
 ## Gestos en el móvil
 
+En el lector, el botón «Aa» abre los ajustes: tamaño de letra, tipografía
+(serif del sistema, Georgia o palo seco), ancho de columna y tema. Se guardan
+por dispositivo y se aplican antes del primer pintado.
+
 - **Tirar hacia abajo** con la lista arriba del todo recarga y sincroniza.
 - **Deslizar una fila hacia la izquierda** la archiva, o la devuelve a pendientes
   desde el archivo.

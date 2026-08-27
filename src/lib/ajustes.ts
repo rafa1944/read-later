@@ -1,7 +1,14 @@
 export type Tema = 'auto' | 'claro' | 'oscuro' | 'sepia';
 export type Ancho = 'estrecho' | 'medio' | 'ancho';
 export type Densidad = 'completa' | 'compacta';
-export type Ajustes = { escala: number; ancho: Ancho; tema: Tema; densidad: Densidad };
+export type Letra = 'serif' | 'georgia' | 'palo';
+export type Ajustes = {
+  escala: number;
+  ancho: Ancho;
+  tema: Tema;
+  densidad: Densidad;
+  letra: Letra;
+};
 
 export const CLAVE_AJUSTES = 'read-later:lectura';
 
@@ -10,6 +17,7 @@ export const AJUSTES_POR_DEFECTO: Ajustes = {
   ancho: 'medio',
   tema: 'auto',
   densidad: 'completa',
+  letra: 'serif',
 };
 
 export const ESCALA_MINIMA = 0.85;
@@ -19,6 +27,7 @@ export const PASO_ESCALA = 0.075;
 const TEMAS: Tema[] = ['auto', 'claro', 'oscuro', 'sepia'];
 const ANCHOS: Ancho[] = ['estrecho', 'medio', 'ancho'];
 const DENSIDADES: Densidad[] = ['completa', 'compacta'];
+const LETRAS: Letra[] = ['serif', 'georgia', 'palo'];
 
 export function normalizarAjustes(valor: unknown): Ajustes {
   if (!valor || typeof valor !== 'object') return AJUSTES_POR_DEFECTO;
@@ -36,6 +45,11 @@ export function normalizarAjustes(valor: unknown): Ajustes {
     densidad: DENSIDADES.includes(bruto.densidad as Densidad)
       ? (bruto.densidad as Densidad)
       : AJUSTES_POR_DEFECTO.densidad,
+    // Igual que la densidad: unos ajustes guardados antes de que existiera
+    // este campo son válidos y se completan, no se descartan.
+    letra: LETRAS.includes(bruto.letra as Letra)
+      ? (bruto.letra as Letra)
+      : AJUSTES_POR_DEFECTO.letra,
     escala:
       Math.round(Math.min(ESCALA_MAXIMA, Math.max(ESCALA_MINIMA, bruto.escala)) * 1000) / 1000,
   };
@@ -49,6 +63,7 @@ export function aplicarAjustes(ajustes: Ajustes, raiz = document.documentElement
   }
   raiz.dataset.ancho = ajustes.ancho;
   raiz.dataset.densidad = ajustes.densidad;
+  raiz.dataset.letra = ajustes.letra;
   raiz.style.setProperty('--escala', String(ajustes.escala));
 }
 
@@ -63,6 +78,7 @@ try {
   if (a.tema && a.tema !== 'auto') r.dataset.tema = a.tema;
   if (a.ancho) r.dataset.ancho = a.ancho;
   if (a.densidad) r.dataset.densidad = a.densidad;
+  if (a.letra) r.dataset.letra = a.letra;
   if (a.escala) r.style.setProperty('--escala', String(a.escala));
 } catch (e) {}
 `.trim();

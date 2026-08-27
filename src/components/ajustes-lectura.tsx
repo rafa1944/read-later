@@ -11,6 +11,7 @@ import {
   normalizarAjustes,
   type Ajustes,
   type Ancho,
+  type Letra,
   type Tema,
 } from '@/lib/ajustes';
 
@@ -19,6 +20,12 @@ const TEMAS: { valor: Tema; texto: string }[] = [
   { valor: 'claro', texto: 'Claro' },
   { valor: 'oscuro', texto: 'Oscuro' },
   { valor: 'sepia', texto: 'Sepia' },
+];
+
+const LETRAS: { valor: Letra; texto: string }[] = [
+  { valor: 'serif', texto: 'Serif' },
+  { valor: 'georgia', texto: 'Georgia' },
+  { valor: 'palo', texto: 'Palo seco' },
 ];
 
 const ANCHOS: { valor: Ancho; texto: string }[] = [
@@ -92,6 +99,23 @@ export function AjustesLectura() {
               >
                 A+
               </button>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Tipografía</legend>
+            <div className="opciones">
+              {LETRAS.map(({ valor, texto }) => (
+                <button
+                  key={valor}
+                  type="button"
+                  data-muestra={valor}
+                  aria-pressed={ajustes.letra === valor}
+                  onClick={() => cambiar({ letra: valor })}
+                >
+                  {texto}
+                </button>
+              ))}
             </div>
           </fieldset>
 

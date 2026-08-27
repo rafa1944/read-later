@@ -64,3 +64,40 @@ test('la búsqueda conserva su fragmento aunque el listado esté compacto', asyn
   // El fragmento es el motivo de buscar: compacto no debe tocarlo.
   await expect(page.locator('mark').first()).toContainText(palabra);
 });
+
+test('cambiar la tipografía afecta al cuerpo del artículo y persiste', async ({
+  page,
+  request,
+}, info) => {
+  const titulo = `Tipografía ${info.testId}`;
+  await request.post('/api/items', {
+    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+    data: {
+      url: `https://ejemplo.com/tipo-${info.testId}`,
+      title: titulo,
+      html: `<p>${'palabra '.repeat(400)}</p>`,
+    },
+  });
+
+  await page.goto('/login');
+  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await page.getByRole('link', { name: titulo }).click();
+
+  const cuerpo = page.locator('.cuerpo');
+  const inicial = await cuerpo.evaluate((el) => getComputedStyle(el).fontFamily);
+
+  await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
+  await page.getByRole('button', { name: 'Palo seco' }).click();
+
+  const conPalo = await cuerpo.evaluate((el) => getComputedStyle(el).fontFamily);
+  expect(conPalo).not.toBe(inicial);
+
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-letra', 'palo');
+  expect(await cuerpo.evaluate((el) => getComputedStyle(el).fontFamily)).toBe(conPalo);
+
+  await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
+  await page.getByRole('button', { name: 'Georgia' }).click();
+  expect(await cuerpo.evaluate((el) => getComputedStyle(el).fontFamily)).toContain('Georgia');
+});

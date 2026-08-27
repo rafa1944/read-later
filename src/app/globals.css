@@ -907,3 +907,64 @@ a,
 @media (prefers-reduced-motion: reduce) {
   .deslizante.volviendo { transition: none; }
 }
+
+/* ---------- Tipografía de lectura ---------- */
+
+/*
+ * Solo pilas del sistema: una fuente web serían 100-300 KB que habría que
+ * precachear para no romper la lectura sin conexión, y hoy la app no descarga
+ * ninguna. Se cambia la variable, y con ella el cuerpo y el título del lector.
+ */
+:root[data-letra='georgia'] {
+  --serif: Georgia, "Times New Roman", ui-serif, serif;
+}
+
+:root[data-letra='palo'] {
+  --serif: var(--sans);
+}
+
+/* ---------- Botón de ajustes de lectura ---------- */
+
+.ajustes > button {
+  width: 3.25rem;
+  height: 3.25rem;
+  box-shadow: 0 2px 14px rgb(0 0 0 / 10%);
+  font-size: 1.1rem;
+}
+
+@media (pointer: coarse) {
+  .ajustes {
+    right: max(1.25rem, env(safe-area-inset-right));
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+  }
+
+  .ajustes > button {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.2rem;
+  }
+
+  .panel {
+    bottom: 4.25rem;
+    width: min(17rem, calc(100vw - 2rem));
+    padding: 1.25rem 1.25rem 1.4rem;
+    /* Con cuatro grupos, en un móvil pequeño en horizontal no cabría. */
+    max-height: calc(100dvh - 7rem);
+    overflow-y: auto;
+  }
+
+  .opciones { gap: 0.45rem; }
+
+  .opciones button {
+    min-height: 2.75rem;
+    font-size: 0.8rem;
+  }
+
+  .panel legend { padding-bottom: 0.6rem; }
+  .panel fieldset { margin-bottom: 1.25rem; }
+}
+
+/* Las muestras de tipografía se escriben con la fuente que ofrecen. */
+.opciones button[data-muestra='serif'] { font-family: ui-serif, Georgia, serif; }
+.opciones button[data-muestra='georgia'] { font-family: Georgia, "Times New Roman", serif; }
+.opciones button[data-muestra='palo'] { font-family: var(--sans); }

@@ -94,3 +94,47 @@ test.describe('con ratón', () => {
     expect(alto).toBeLessThan(30);
   });
 });
+
+test.describe('lector con el dedo', () => {
+  test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
+
+  test('el botón de ajustes y sus opciones llegan al tamaño mínimo', async ({
+    page,
+    request,
+  }, info) => {
+    const titulo = `Lector ${info.testId}`;
+    await request.post('/api/items', {
+      headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+      data: {
+        url: `https://ejemplo.com/lector-toques-${info.testId}`,
+        title: titulo,
+        html: `<p>${'palabra '.repeat(400)}</p>`,
+      },
+    });
+
+    await page.goto('/login');
+    await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await page.getByRole('link', { name: titulo }).click();
+
+    const boton = page.getByRole('button', { name: 'Ajustes de lectura' });
+    await expect(boton).toBeVisible();
+
+    const caja = (await boton.boundingBox())!;
+    expect(Math.round(caja.width)).toBeGreaterThanOrEqual(MINIMO);
+    expect(Math.round(caja.height)).toBeGreaterThanOrEqual(MINIMO);
+
+    await boton.click();
+
+    // Las opciones del panel también se tocan con el dedo.
+    const pequeñas = await page.evaluate((minimo) =>
+      [...document.querySelectorAll('.panel .opciones button')]
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          return { texto: el.textContent, alto: Math.round(r.height) };
+        })
+        .filter((m) => m.alto < minimo), MINIMO);
+
+    expect(pequeñas).toEqual([]);
+  });
+});

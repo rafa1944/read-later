@@ -9,6 +9,7 @@ describe('normalizarAjustes', () => {
       ancho: 'ancho' as const,
       tema: 'sepia' as const,
       densidad: 'compacta' as const,
+      letra: 'georgia' as const,
     };
     expect(normalizarAjustes(ajustes)).toEqual(ajustes);
   });
@@ -28,7 +29,10 @@ describe('normalizarAjustes', () => {
 describe('aplicarAjustes', () => {
   it('escribe los atributos y la variable de escala en la raíz', () => {
     const raiz = document.documentElement;
-    aplicarAjustes({ escala: 1.15, ancho: 'ancho', tema: 'oscuro', densidad: 'completa' }, raiz);
+    aplicarAjustes(
+      { escala: 1.15, ancho: 'ancho', tema: 'oscuro', densidad: 'completa', letra: 'serif' },
+      raiz,
+    );
 
     expect(raiz.dataset.tema).toBe('oscuro');
     expect(raiz.dataset.ancho).toBe('ancho');
@@ -37,7 +41,10 @@ describe('aplicarAjustes', () => {
 
   it('con tema automático no fija ningún tema, para dejar mandar al sistema', () => {
     const raiz = document.documentElement;
-    aplicarAjustes({ escala: 1, ancho: 'medio', tema: 'auto', densidad: 'completa' }, raiz);
+    aplicarAjustes(
+      { escala: 1, ancho: 'medio', tema: 'auto', densidad: 'completa', letra: 'serif' },
+      raiz,
+    );
 
     expect(raiz.dataset.tema).toBeUndefined();
   });
@@ -75,5 +82,42 @@ describe('densidad de la lista', () => {
   it('escribe la densidad en la raíz', () => {
     aplicarAjustes({ ...AJUSTES_POR_DEFECTO, densidad: 'compacta' }, document.documentElement);
     expect(document.documentElement.dataset.densidad).toBe('compacta');
+  });
+});
+
+describe('tipografía de lectura', () => {
+  it('por defecto es la serif del sistema', () => {
+    expect(AJUSTES_POR_DEFECTO.letra).toBe('serif');
+  });
+
+  it('acepta las tres opciones', () => {
+    for (const letra of ['serif', 'georgia', 'palo'] as const) {
+      expect(normalizarAjustes({ ...AJUSTES_POR_DEFECTO, letra }).letra).toBe(letra);
+    }
+  });
+
+  it('unos ajustes guardados antes de que existiera la tipografía siguen valiendo', () => {
+    const antiguos = {
+      escala: 1.2,
+      ancho: 'ancho' as const,
+      tema: 'sepia' as const,
+      densidad: 'compacta' as const,
+    };
+    const normalizados = normalizarAjustes(antiguos);
+
+    expect(normalizados.densidad).toBe('compacta');
+    expect(normalizados.letra).toBe('serif');
+  });
+
+  it('una tipografía inventada no tira el resto de los ajustes', () => {
+    const n = normalizarAjustes({ ...AJUSTES_POR_DEFECTO, letra: 'gótica', tema: 'oscuro' });
+
+    expect(n.letra).toBe('serif');
+    expect(n.tema).toBe('oscuro');
+  });
+
+  it('la escribe en la raíz', () => {
+    aplicarAjustes({ ...AJUSTES_POR_DEFECTO, letra: 'palo' }, document.documentElement);
+    expect(document.documentElement.dataset.letra).toBe('palo');
   });
 });
