@@ -34,14 +34,8 @@ test('el velo superior cubre el contenido pero no captura los toques', async ({
     };
   });
 
-  /*
-   * En Safari como navegador env(safe-area-inset-top) vale 0, y el contenido
-   * pasa igualmente bajo el reloj al desplazarse. Atado solo al área segura, el
-   * velo se quedaba en 44 px con 8 opacos y el texto se leía detrás de la hora.
-   * La barra de estado de un iPhone ronda los 44-54 px: el velo tiene que
-   * cubrirla con holgura por sí mismo.
-   */
-  expect(velo.alto, 'alto del velo sin área segura').toBeGreaterThanOrEqual(76);
+  // Solo suaviza el corte del texto: de la barra de estado se encarga iOS.
+  expect(velo.alto, 'alto del velo').toBeGreaterThan(16);
 
   expect(velo.existe).toBe(true);
   expect(velo.posicion).toBe('fixed');
@@ -101,36 +95,28 @@ test('el velo queda por debajo de los controles flotantes', async ({ page, reque
   expect(capas.ajustes).toBeGreaterThan(capas.velo);
 });
 
-test('la franja opaca cubre una barra de estado real', async ({ page, request }, info) => {
-  const titulo = `Franja ${info.testId}`;
-  await request.post('/api/items', {
-    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
-    data: {
-      url: `https://ejemplo.com/franja-${info.testId}`,
-      title: titulo,
-      html: `<p>${'palabra '.repeat(300)}</p>`,
-    },
-  });
-
+test('no se pide la pantalla completa, para que iOS reserve la barra de estado', async ({
+  page,
+}) => {
   await page.goto('/login');
-  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
-  await page.getByRole('button', { name: 'Entrar' }).click();
-  await expect(page.getByRole('link', { name: titulo })).toBeVisible();
 
-  const solido = await page.evaluate(() => {
-    const sonda = document.createElement('div');
-    sonda.style.cssText = 'position:fixed;top:0;height:var(--velo-solido)';
-    document.body.appendChild(sonda);
-    const alto = sonda.getBoundingClientRect().height;
-    sonda.remove();
-    return alto;
-  });
+  const viewport = await page
+    .locator('meta[name="viewport"]')
+    .getAttribute('content');
 
   /*
-   * La barra de estado de un iPhone con isla dinámica ronda los 60 px, y el
-   * contenido pasa por debajo tanto en Safari como en la app instalada. En
-   * ambos casos env(safe-area-inset-top) devuelve 0, así que la franja no puede
-   * depender de él: tiene que taparla por sí sola.
+   * Con viewport-fit=cover el contenido se pinta detrás del reloj, pero medido
+   * en un iPhone con isla dinámica: el área segura devuelve 0 y los elementos
+   * fijos toman como origen el borde inferior de esa barra, así que no hay
+   * forma de taparlo desde CSS. Sin él, iOS reserva la franja y la pinta con el
+   * theme-color, que es el mismo fondo de la app.
    */
-  expect(solido, 'franja opaca sin área segura declarada').toBeGreaterThanOrEqual(56);
+  expect(viewport, 'viewport declarado').not.toContain('viewport-fit=cover');
+
+  const temas = await page.locator('meta[name="theme-color"]').evaluateAll((metas) =>
+    metas.map((m) => m.getAttribute('content')),
+  );
+  // Si el color no coincidiera con el fondo, esa franja se vería como un hueco.
+  expect(temas).toContain('#e9eae5');
+  expect(temas).toContain('#14171a');
 });

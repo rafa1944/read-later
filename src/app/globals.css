@@ -16,17 +16,12 @@
   --medida: 34rem;
 
   /*
-   * Franja superior tapada.
-   *
-   * Medido en un iPhone con isla dinámica: el contenido pasa bajo el reloj
-   * tanto en Safari como en la app instalada, y en los dos casos
-   * env(safe-area-inset-top) devuelve 0. No se puede confiar en él, así que la
-   * franja tiene altura propia: 3,75 rem son los ~60 px que ocupa la barra de
-   * estado de los iPhone actuales. Si algún día el sistema declara un área
-   * segura mayor, el max() la respeta.
+   * Desvanecimiento en el borde superior del contenido. Ya no tiene que tapar
+   * la barra de estado —de eso se encarga iOS al reservarla—, solo suavizar el
+   * corte del texto que sube.
    */
-  --velo-solido: max(3.75rem, env(safe-area-inset-top, 0px));
-  --velo-fundido: 2rem;
+  --velo-solido: 0.5rem;
+  --velo-fundido: 1.5rem;
 
   --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;

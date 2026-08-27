@@ -14,12 +14,23 @@ export const metadata: Metadata = {
   icons: { apple: '/iconos/180.png' },
 };
 
+/*
+ * Sin viewport-fit: cover a propósito.
+ *
+ * Con él, el contenido se pinta detrás de la barra de estado, pero medido en un
+ * iPhone con isla dinámica: env(safe-area-inset-top) devuelve 0 y los elementos
+ * fijos se posicionan tomando como origen el borde inferior de esa barra. O
+ * sea, el texto pasa por debajo del reloj y no hay forma de taparlo desde CSS.
+ *
+ * Sin él, iOS reserva la barra y la pinta con el theme-color de abajo, que es
+ * el mismo fondo de la app: el resultado se ve continuo y ningún texto llega a
+ * cruzarse con la hora.
+ */
 export const viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#e9eae5' },
     { media: '(prefers-color-scheme: dark)', color: '#14171a' },
   ],
-  viewportFit: 'cover' as const,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
