@@ -33,6 +33,21 @@
 
 * { box-sizing: border-box; }
 
+/*
+ * Velo superior: sólido pegado al borde y desvanecido hacia abajo, para que el
+ * texto se pierda bajo la muesca en lugar de chocar con el reloj. No captura
+ * toques, o se comería el enlace de volver.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: calc(env(safe-area-inset-top, 0px) + 1.5rem);
+  background: linear-gradient(to bottom, var(--fondo) 0%, var(--fondo) 42%, transparent 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
 html { -webkit-text-size-adjust: 100%; }
 
 body {
@@ -74,7 +89,9 @@ a,
 .columna {
   max-width: calc(var(--medida) + 6rem);
   margin: 0 auto;
-  padding: 2rem 1.25rem 6rem;
+  /* En un móvil con muesca, sin esto el contenido nace bajo el reloj. */
+  padding: calc(env(safe-area-inset-top, 0px) + 2rem) 1.25rem 6rem;
+  padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right));
 }
 
 /* ---------- Cabecera ---------- */
@@ -262,7 +279,7 @@ a,
   inset: 0 auto 0 0;
   width: 3px;
   background: var(--linea);
-  z-index: 2;
+  z-index: 4;
 }
 
 .rail > i {
@@ -441,7 +458,7 @@ a,
 .entrada button:disabled { opacity: 0.45; cursor: default; }
 
 @media (max-width: 30rem) {
-  .columna { padding: 1.5rem 1rem 5rem; }
+  .columna { padding: calc(env(safe-area-inset-top, 0px) + 1.25rem) 1rem 5rem; }
   .fila { grid-template-columns: 2px 2.25rem minmax(0, 1fr); gap: 0 0.85rem; }
   .lector h1 { font-size: 1.55rem; }
   .cuerpo { font-size: 1.08rem; }
@@ -528,7 +545,7 @@ a,
   position: fixed;
   right: max(1rem, env(safe-area-inset-right));
   bottom: max(1rem, env(safe-area-inset-bottom));
-  z-index: 3;
+  z-index: 4;
 }
 
 .ajustes > button {
@@ -631,7 +648,7 @@ a,
   position: fixed;
   inset: 0 0 auto 0;
   height: 2px;
-  z-index: 4;
+  z-index: 5;
   pointer-events: none;
 }
 
@@ -873,7 +890,7 @@ a,
   position: fixed;
   left: 50%;
   bottom: max(1.25rem, env(safe-area-inset-bottom));
-  z-index: 5;
+  z-index: 6;
   transform: translateX(-50%);
   padding: 0.6rem 1rem;
   border: 1px solid var(--linea);
