@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { destinoDe as decidir, esCacheFirst, esSWR, sobrantes } from '@/sw/estrategia';
+import {
+  cachesObsoletas,
+  destinoDe as decidir,
+  esCacheFirst,
+  esSWR,
+  sobrantes,
+} from '@/sw/estrategia';
 
 const O = 'https://leer.ejemplo.com';
 
@@ -81,5 +87,21 @@ describe('sobrantes', () => {
 
   it('no devuelve nada si todo sigue haciendo falta', () => {
     expect(sobrantes(['/a/1'], ['/a/1', '/a/2'])).toEqual([]);
+  });
+});
+
+describe('cachesObsoletas', () => {
+  it('tira las cachés propias de versiones anteriores', () => {
+    expect(
+      cachesObsoletas(['rl-paginas-vA', 'rl-paginas-vB', 'rl-imagenes-vA'], ['rl-paginas-vB']),
+    ).toEqual(['rl-paginas-vA', 'rl-imagenes-vA']);
+  });
+
+  it('no toca cachés de otros: la app no es la única que usa el navegador', () => {
+    expect(cachesObsoletas(['otra-cosa', 'workbox-precache'], ['rl-paginas-vB'])).toEqual([]);
+  });
+
+  it('conserva las de la versión vigente', () => {
+    expect(cachesObsoletas(['rl-paginas-vB'], ['rl-paginas-vB'])).toEqual([]);
   });
 });

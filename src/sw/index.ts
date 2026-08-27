@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { CACHES, destinoDe, esCacheFirst, esSWR, sobrantes } from './estrategia';
+import { CACHES, cachesObsoletas, destinoDe, esCacheFirst, esSWR, sobrantes } from './estrategia';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -19,9 +19,8 @@ self.addEventListener('install', (evento) => {
 self.addEventListener('activate', (evento) => {
   evento.waitUntil(
     (async () => {
-      for (const nombre of await caches.keys()) {
-        if (nombre.startsWith('rl-') && !VIGENTES.has(nombre)) await caches.delete(nombre);
-      }
+      const obsoletas = cachesObsoletas(await caches.keys(), [...VIGENTES]);
+      for (const nombre of obsoletas) await caches.delete(nombre);
       await self.clients.claim();
     })(),
   );
@@ -91,7 +90,11 @@ async function avisar(tipo: Aviso) {
  * 'servido-de-cache' y pide los datos frescos, así que lo que se ve al abrir
  * aparece de inmediato y se corrige solo en cuanto llega la red.
  */
-async function desdeCacheYRevalidar(peticion: Request, nombre: string): Promise<Response> {
+async function desdeCacheYRevalidar(
+  evento: FetchEvent,
+  peticion: Request,
+  nombre: string,
+): Promise<Response> {
   const cache = await caches.open(nombre);
   const guardada = await cache.match(peticion, COINCIDENCIA);
 
@@ -105,6 +108,13 @@ async function desdeCacheYRevalidar(peticion: Request, nombre: string): Promise<
       return respuesta;
     })
     .catch(() => null);
+
+  /*
+   * Sin waitUntil el navegador puede matar el service worker en cuanto se
+   * devuelve la copia guardada, y la revalidación no llega a completarse: la
+   * caché no se actualiza nunca y se sirve la versión vieja para siempre.
+   */
+  evento.waitUntil(revalidacion);
 
   if (!guardada) {
     const fresca = await revalidacion;
@@ -145,7 +155,7 @@ self.addEventListener('fetch', (evento) => {
   if (esCacheFirst(destino)) {
     evento.respondWith(desdeCache(peticion, nombre));
   } else if (esSWR(destino)) {
-    evento.respondWith(desdeCacheYRevalidar(peticion, nombre));
+    evento.respondWith(desdeCacheYRevalidar(evento, peticion, nombre));
   } else {
     evento.respondWith(desdeRed(peticion, nombre, esNavegacion));
   }

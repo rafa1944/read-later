@@ -1,9 +1,24 @@
+/**
+ * La inyecta el empaquetado en cada compilación. Va en el nombre de las cachés
+ * para que un despliegue nuevo invalide lo guardado: sin esto, una página
+ * cacheada seguiría apuntando a la hoja de estilos vieja indefinidamente.
+ */
+declare const VERSION_COMPILACION: string;
+
+const v = typeof VERSION_COMPILACION === 'string' ? VERSION_COMPILACION : 'dev';
+
 export const CACHES = {
-  estaticos: 'rl-estaticos-v1',
-  paginas: 'rl-paginas-v1',
-  imagenes: 'rl-imagenes-v1',
-  datos: 'rl-datos-v1',
+  estaticos: `rl-estaticos-${v}`,
+  paginas: `rl-paginas-${v}`,
+  imagenes: `rl-imagenes-${v}`,
+  datos: `rl-datos-${v}`,
 } as const;
+
+/** Cachés propias que ya no corresponden a esta versión. */
+export function cachesObsoletas(existentes: string[], vigentes: string[]): string[] {
+  const vivas = new Set(vigentes);
+  return existentes.filter((nombre) => nombre.startsWith('rl-') && !vivas.has(nombre));
+}
 
 export type Destino = keyof typeof CACHES | null;
 
