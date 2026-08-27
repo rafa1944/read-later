@@ -21,3 +21,12 @@ export function amortiguar(distancia: number, maximo: number): number {
   if (distancia <= 0) return 0;
   return maximo * (1 - Math.exp(-distancia / maximo));
 }
+
+/**
+ * En iOS, tirar hacia abajo estando arriba del todo deja `scrollY` en negativo
+ * mientras dura el rebote elástico. Leerlo es más fiable que intentar ganarle
+ * el gesto a Safari con preventDefault, que depende de qué haya bajo el dedo.
+ */
+export function distanciaDeSobrescroll(scrollY: number): number {
+  return Math.max(0, -scrollY);
+}

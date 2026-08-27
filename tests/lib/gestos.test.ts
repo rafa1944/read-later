@@ -5,6 +5,7 @@ import {
   UMBRAL_TIRON,
   amortiguar,
   decidirEje,
+  distanciaDeSobrescroll,
 } from '@/lib/gestos';
 
 describe('decidirEje', () => {
@@ -56,5 +57,17 @@ describe('umbrales', () => {
   it('archivar exige más recorrido que recargar', () => {
     // Archivar cambia datos; recargar no. El accidental debe costar más.
     expect(UMBRAL_DESLIZAR).toBeGreaterThan(UMBRAL_TIRON);
+  });
+});
+
+describe('distanciaDeSobrescroll', () => {
+  it('es cero mientras la página está en su sitio o desplazada', () => {
+    expect(distanciaDeSobrescroll(0)).toBe(0);
+    expect(distanciaDeSobrescroll(340)).toBe(0);
+  });
+
+  it('en iOS el rebote deja scrollY en negativo, y eso es el tirón', () => {
+    expect(distanciaDeSobrescroll(-40)).toBe(40);
+    expect(distanciaDeSobrescroll(-120)).toBe(120);
   });
 });

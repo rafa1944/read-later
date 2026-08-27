@@ -2,15 +2,29 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { UMBRAL_TIRON, amortiguar, decidirEje, type Eje } from '@/lib/gestos';
+import {
+  UMBRAL_TIRON,
+  amortiguar,
+  decidirEje,
+  distanciaDeSobrescroll,
+  type Eje,
+} from '@/lib/gestos';
 import { EVENTO_SINCRONIZAR } from './sincronizador';
 
 const MAXIMO = 96;
 
 /**
- * En una PWA en modo standalone, iOS no ofrece el tirón nativo para recargar,
- * así que se implementa aquí. Solo actúa con la página arriba del todo, para no
- * secuestrar el desplazamiento normal.
+ * En una PWA en modo standalone, iOS no ofrece el tirón nativo para recargar.
+ *
+ * Se detecta por dos vías a la vez porque ninguna sirve en todas partes:
+ *
+ * 1. Táctil. Se mide el arrastre y se corta el gesto del navegador. Funciona en
+ *    Chromium, pero en Safari depende de qué elemento haya bajo el dedo, así
+ *    que no se puede confiar solo en ella.
+ * 2. Sobrescroll. Safari deja `scrollY` en negativo durante el rebote elástico;
+ *    ese número es el tirón, y da igual dónde empezara el dedo.
+ *
+ * Gana la que más recorrido detecte durante el gesto.
  */
 export function TirarParaRefrescar() {
   const router = useRouter();
@@ -20,8 +34,16 @@ export function TirarParaRefrescar() {
 
   const inicio = useRef<{ x: number; y: number } | null>(null);
   const eje = useRef<Eje>('indeciso');
+  const maximo = useRef(0);
+  const recargandoRef = useRef(false);
 
   useEffect(() => {
+    function anotar(recorrido: number) {
+      if (recargandoRef.current) return;
+      if (recorrido > maximo.current) maximo.current = recorrido;
+      setDistancia(recorrido);
+    }
+
     function alEmpezar(evento: TouchEvent) {
       if (window.scrollY > 0 || evento.touches.length !== 1) {
         inicio.current = null;
@@ -30,10 +52,11 @@ export function TirarParaRefrescar() {
       const dedo = evento.touches[0];
       inicio.current = { x: dedo.clientX, y: dedo.clientY };
       eje.current = 'indeciso';
+      maximo.current = 0;
     }
 
     function alMover(evento: TouchEvent) {
-      if (!inicio.current || recargando) return;
+      if (!inicio.current || recargandoRef.current) return;
 
       const dedo = evento.touches[0];
       const dx = dedo.clientX - inicio.current.x;
@@ -42,18 +65,22 @@ export function TirarParaRefrescar() {
       if (eje.current === 'indeciso') eje.current = decidirEje(dx, dy);
       if (eje.current !== 'vertical' || dy <= 0) return;
 
-      // Se corta el rebote elástico de Safari: si no, su gesto y el nuestro
-      // pelean y el resultado da tirones.
       if (evento.cancelable) evento.preventDefault();
-      setDistancia(amortiguar(dy, MAXIMO));
+      anotar(amortiguar(dy, MAXIMO));
+    }
+
+    function alDesplazar() {
+      const rebote = distanciaDeSobrescroll(window.scrollY);
+      if (rebote > 0) anotar(Math.min(rebote, MAXIMO));
     }
 
     function alSoltar() {
-      const recorrido = distancia;
+      const recorrido = maximo.current;
       inicio.current = null;
+      maximo.current = 0;
       setDistancia(0);
 
-      if (recorrido < UMBRAL_TIRON) return;
+      if (recorrido < UMBRAL_TIRON || recargandoRef.current) return;
 
       if (!navigator.onLine) {
         setAviso('Sin conexión');
@@ -61,24 +88,30 @@ export function TirarParaRefrescar() {
         return;
       }
 
+      recargandoRef.current = true;
       setRecargando(true);
       router.refresh();
       window.dispatchEvent(new Event(EVENTO_SINCRONIZAR));
-      setTimeout(() => setRecargando(false), 900);
+      setTimeout(() => {
+        recargandoRef.current = false;
+        setRecargando(false);
+      }, 900);
     }
 
     document.addEventListener('touchstart', alEmpezar, { passive: true });
     document.addEventListener('touchmove', alMover, { passive: false });
     document.addEventListener('touchend', alSoltar, { passive: true });
     document.addEventListener('touchcancel', alSoltar, { passive: true });
+    window.addEventListener('scroll', alDesplazar, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', alEmpezar);
       document.removeEventListener('touchmove', alMover);
       document.removeEventListener('touchend', alSoltar);
       document.removeEventListener('touchcancel', alSoltar);
+      window.removeEventListener('scroll', alDesplazar);
     };
-  }, [distancia, recargando, router]);
+  }, [router]);
 
   const progreso = Math.min(1, distancia / UMBRAL_TIRON);
 
