@@ -22,7 +22,7 @@ export function EstadoRed() {
 
     function mensaje(evento: MessageEvent) {
       const tipo = (evento.data as { tipo?: string })?.tipo;
-      if (tipo === 'desde-cache') setDesdeCache(true);
+      if (tipo === 'sin-red') setDesdeCache(true);
       if (tipo === 'con-red') setDesdeCache(false);
     }
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   destinoDe as decidir,
   esCacheFirst,
+  esSWR,
   sobrantes,
   urlsDeImagen,
 } from '@/sw/estrategia';
@@ -61,6 +62,21 @@ describe('esCacheFirst', () => {
     // que estar al día.
     expect(esCacheFirst('paginas')).toBe(false);
     expect(esCacheFirst('datos')).toBe(false);
+  });
+});
+
+describe('esSWR', () => {
+  it('las páginas se pintan de la caché y se revalidan por detrás', () => {
+    expect(esSWR('paginas')).toBe(true);
+  });
+
+  it('los datos no: una lista vieja servida como buena confunde', () => {
+    expect(esSWR('datos')).toBe(false);
+  });
+
+  it('lo inmutable no lo necesita, ya va primero por caché', () => {
+    expect(esSWR('estaticos')).toBe(false);
+    expect(esSWR('imagenes')).toBe(false);
   });
 });
 

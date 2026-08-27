@@ -1,5 +1,5 @@
 /// <reference lib="webworker" />
-import { CACHES, destinoDe, esCacheFirst, sobrantes } from './estrategia';
+import { CACHES, destinoDe, esCacheFirst, esSWR, sobrantes } from './estrategia';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -63,14 +63,14 @@ async function desdeRed(
     const guardada = await cache.match(peticion, COINCIDENCIA);
     if (guardada) {
       sirviendoDesdeCache = true;
-      void avisar('desde-cache');
+      void avisar('sin-red');
       return guardada;
     }
     if (esNavegacion) {
       const ultimo = await cache.match('/sin-conexion', COINCIDENCIA);
       if (ultimo) {
         sirviendoDesdeCache = true;
-        void avisar('desde-cache');
+        void avisar('sin-red');
         return ultimo;
       }
     }
@@ -80,8 +80,54 @@ async function desdeRed(
 
 let sirviendoDesdeCache = false;
 
-async function avisar(tipo: 'desde-cache' | 'con-red') {
+type Aviso = 'sin-red' | 'con-red' | 'servido-de-cache';
+
+async function avisar(tipo: Aviso) {
   for (const cliente of await self.clients.matchAll()) cliente.postMessage({ tipo });
+}
+
+/**
+ * Pinta lo guardado al instante y revalida por detrás. El cliente recibe
+ * 'servido-de-cache' y pide los datos frescos, así que lo que se ve al abrir
+ * aparece de inmediato y se corrige solo en cuanto llega la red.
+ */
+async function desdeCacheYRevalidar(peticion: Request, nombre: string): Promise<Response> {
+  const cache = await caches.open(nombre);
+  const guardada = await cache.match(peticion, COINCIDENCIA);
+
+  const revalidacion = fetch(peticion)
+    .then(async (respuesta) => {
+      if (respuesta.ok && !respuesta.redirected) await cache.put(peticion, respuesta.clone());
+      if (sirviendoDesdeCache) {
+        sirviendoDesdeCache = false;
+        void avisar('con-red');
+      }
+      return respuesta;
+    })
+    .catch(() => null);
+
+  if (!guardada) {
+    const fresca = await revalidacion;
+    if (fresca) return fresca;
+
+    const ultimo = await cache.match('/sin-conexion', COINCIDENCIA);
+    if (ultimo) {
+      sirviendoDesdeCache = true;
+      void avisar('sin-red');
+      return ultimo;
+    }
+    return new Response('Sin conexión y sin copia guardada', { status: 504 });
+  }
+
+  void revalidacion.then((fresca) => {
+    if (!fresca) {
+      sirviendoDesdeCache = true;
+      void avisar('sin-red');
+    }
+  });
+
+  void avisar('servido-de-cache');
+  return guardada;
 }
 
 self.addEventListener('fetch', (evento) => {
@@ -96,9 +142,13 @@ self.addEventListener('fetch', (evento) => {
   if (!destino) return;
 
   const nombre = CACHES[destino];
-  evento.respondWith(
-    esCacheFirst(destino) ? desdeCache(peticion, nombre) : desdeRed(peticion, nombre, esNavegacion),
-  );
+  if (esCacheFirst(destino)) {
+    evento.respondWith(desdeCache(peticion, nombre));
+  } else if (esSWR(destino)) {
+    evento.respondWith(desdeCacheYRevalidar(peticion, nombre));
+  } else {
+    evento.respondWith(desdeRed(peticion, nombre, esNavegacion));
+  }
 });
 
 function claveRelativa(url: string): string {
@@ -117,7 +167,7 @@ self.addEventListener('message', (evento) => {
   // Al servir una navegación desde la caché, el aviso llega a la página que se
   // está abandonando, no a la nueva. Por eso la nueva pregunta al cargar.
   if (datos?.tipo === 'estado') {
-    evento.waitUntil(avisar(sirviendoDesdeCache ? 'desde-cache' : 'con-red'));
+    evento.waitUntil(avisar(sirviendoDesdeCache ? 'sin-red' : 'con-red'));
     return;
   }
 

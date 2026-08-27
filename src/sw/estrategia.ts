@@ -48,6 +48,15 @@ export function esCacheFirst(destino: Destino): boolean {
   return destino === 'estaticos' || destino === 'imagenes';
 }
 
+/**
+ * Pintar de la caché y revalidar por detrás. Solo para páginas: son lo que
+ * bloquea el primer pintado, y verlas al instante pesa más que verlas al día,
+ * porque el cliente pide los datos frescos justo después.
+ */
+export function esSWR(destino: Destino): boolean {
+  return destino === 'paginas';
+}
+
 export function sobrantes(enCache: string[], necesarias: string[]): string[] {
   const conjunto = new Set(necesarias);
   return enCache.filter((clave) => !conjunto.has(clave));
