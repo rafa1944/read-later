@@ -45,6 +45,14 @@ export function Diagnostico() {
           valor: `${window.innerHeight} / ${screen.height} px`,
         },
         { clave: 'Barra de estado', valor: barraApple },
+        {
+          clave: 'Desfase del marco fijo',
+          valor: raiz.getPropertyValue('--desfase-fijo').trim() || '(sin medir)',
+        },
+        {
+          clave: 'Arriba de la banda',
+          valor: getComputedStyle(document.body, '::before').top,
+        },
         { clave: 'theme-color', valor: metaTema },
         { clave: 'Alto del velo', valor: velo.height },
         { clave: 'Velo: parada opaca', valor: velo.backgroundImage.slice(0, 120) },

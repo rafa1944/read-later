@@ -129,3 +129,33 @@ test('la banda opaca cubre la barra de estado', async ({ page }) => {
   // no hay área segura declarada la banda tiene que taparla por sí sola.
   expect(solido, 'banda opaca').toBeGreaterThanOrEqual(56);
 });
+
+test('la banda se sube el desfase medido del marco fijo', async ({ page }) => {
+  await page.goto('/login');
+
+  const posiciones = await page.evaluate(() => {
+    const medir = () => {
+      const e = getComputedStyle(document.body, '::before');
+      return { arriba: e.top, alto: e.height };
+    };
+
+    const sinDesfase = medir();
+    document.documentElement.style.setProperty('--desfase-fijo', '62px');
+    const conDesfase = medir();
+    document.documentElement.style.removeProperty('--desfase-fijo');
+    return { sinDesfase, conDesfase };
+  });
+
+  expect(posiciones.sinDesfase.arriba).toBe('0px');
+
+  /*
+   * En la app instalada de iOS el contenido se pinta desde el borde de la
+   * pantalla pero lo fijo empieza bajo la barra de estado. La banda sube ese
+   * desfase para aterrizar en el borde; si no, se dibuja por debajo del reloj
+   * y el texto se ve pasar por detrás de la hora.
+   */
+  expect(posiciones.conDesfase.arriba).toBe('-62px');
+
+  // Y no crece con el desfase: si creciera, taparía la primera línea del texto.
+  expect(posiciones.conDesfase.alto).toBe(posiciones.sinDesfase.alto);
+});

@@ -53,6 +53,13 @@ body::before {
   content: '';
   position: fixed;
   inset: 0 0 auto 0;
+  /*
+   * Se sube el desfase medido en JavaScript. En la app instalada de iOS un
+   * elemento fijo empieza por debajo de la barra de estado mientras el
+   * contenido se pinta desde el borde de la pantalla: sin esto, la banda se
+   * dibuja bajo el reloj y el texto se ve pasar por detrás de la hora.
+   */
+  top: calc(-1 * var(--desfase-fijo, 0px));
   height: calc(var(--velo-solido) + var(--velo-fundido));
   background: linear-gradient(
     to bottom,
