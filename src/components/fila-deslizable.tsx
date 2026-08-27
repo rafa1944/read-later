@@ -1,11 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useRef, useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
+import { FilaContexto } from './contexto-fila';
 import { cambiarArchivado } from '@/lib/acciones';
+import { anunciar } from '@/lib/avisos';
 import { UMBRAL_DESLIZAR, amortiguar, decidirEje, type Eje } from '@/lib/gestos';
 
 const MAXIMO = 120;
+export const DURACION_SALIDA_MS = 240;
 
 type Props = { id: string; archivado: boolean; children: React.ReactNode };
 
@@ -18,7 +21,22 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
   const router = useRouter();
   const [desplazamiento, setDesplazamiento] = useState(0);
   const [encolada, setEncolada] = useState(false);
+  const [saliendo, setSaliendo] = useState(false);
   const [, iniciar] = useTransition();
+
+  /*
+   * Sacar la fila con una animación antes de refrescar. Si no, la lista se
+   * rehace de golpe cuando responde el servidor y lo de abajo pega un salto.
+   */
+  const salir = useCallback(
+    () =>
+      new Promise<void>((resolver) => {
+        setSaliendo(true);
+        const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(resolver, sinMovimiento ? 0 : DURACION_SALIDA_MS);
+      }),
+    [],
+  );
 
   const inicio = useRef<{ x: number; y: number } | null>(null);
   const eje = useRef<Eje>('indeciso');
@@ -55,36 +73,47 @@ export function FilaDeslizable({ id, archivado, children }: Props) {
       setEncolada(true);
       return;
     }
-    if (resultado === 'ok') iniciar(() => router.refresh());
+    if (resultado === 'ok') {
+      anunciar(archivado ? 'Artículo devuelto a pendientes' : 'Artículo archivado');
+      await salir();
+      iniciar(() => router.refresh());
+    }
   }
 
   const activo = desplazamiento >= UMBRAL_DESLIZAR;
   const progreso = Math.min(1, desplazamiento / UMBRAL_DESLIZAR);
 
   return (
-    <div
-      className="deslizable"
-      style={{
-        ['--desplazamiento' as string]: `${desplazamiento}px`,
-        ['--progreso-gesto' as string]: progreso,
-      }}
-    >
-      <span className={activo ? 'accion-gesto lista' : 'accion-gesto'} aria-hidden="true">
-        <span className="rotulo">{archivado ? 'Devolver' : 'Archivar'}</span>
-      </span>
+    <FilaContexto.Provider value={{ salir }}>
+      {/*
+        La envoltura colapsa la altura al salir. El recorte solo se aplica
+        mientras dura la animación: dejarlo puesto convertiría la fila en un
+        contenedor de desplazamiento y en iOS se tragaría el gesto de scroll.
+      */}
+      <div className={saliendo ? 'fila-salida saliendo' : 'fila-salida'}>
+        <div
+          className="deslizable"
+          style={{
+            ['--desplazamiento' as string]: `${desplazamiento}px`,
+            ['--progreso-gesto' as string]: progreso,
+          }}
+        >
+          <span className={activo ? 'accion-gesto lista' : 'accion-gesto'} aria-hidden="true">
+            <span className="rotulo">{archivado ? 'Devolver' : 'Archivar'}</span>
+          </span>
 
-      <div
-        className="deslizante"
-        onTouchStart={alEmpezar}
-        onTouchMove={alMover}
-        onTouchEnd={() => void alSoltar()}
-        onTouchCancel={() => void alSoltar()}
-      >
-        {children}
-        {encolada && (
-          <p className="pendiente rotulo">Se enviará al recuperar la conexión</p>
-        )}
+          <div
+            className="deslizante"
+            onTouchStart={alEmpezar}
+            onTouchMove={alMover}
+            onTouchEnd={() => void alSoltar()}
+            onTouchCancel={() => void alSoltar()}
+          >
+            {children}
+            {encolada && <p className="pendiente rotulo">Se enviará al recuperar la conexión</p>}
+          </div>
+        </div>
       </div>
-    </div>
+    </FilaContexto.Provider>
   );
 }

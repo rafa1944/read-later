@@ -837,3 +837,60 @@ a,
   .opciones button:hover:not(:disabled) { color: var(--tinta); }
   .ajustes > button:hover { color: var(--tinta); }
 }
+
+/* ---------- Salida de una fila ---------- */
+
+/*
+ * Se colapsa la altura con grid en lugar de animar `height`, que exigiría
+ * medirla antes en JavaScript. El recorte va solo en `.saliendo`: dejarlo
+ * siempre haría de la fila un contenedor de desplazamiento, y en iOS eso se
+ * traga el gesto de scroll (ya pasó una vez).
+ */
+.fila-salida {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 240ms ease,
+    opacity 180ms ease;
+}
+
+.fila-salida.saliendo {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.fila-salida.saliendo > * {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fila-salida { transition: none; }
+}
+
+/* ---------- Aviso flotante ---------- */
+
+.aviso-flotante {
+  position: fixed;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 5;
+  transform: translateX(-50%);
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--linea);
+  border-radius: 0.25rem;
+  background: var(--fondo);
+  color: var(--tinta);
+  box-shadow: 0 6px 28px rgb(0 0 0 / 14%);
+  animation: entrar-aviso 200ms ease;
+}
+
+@keyframes entrar-aviso {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aviso-flotante { animation: none; }
+}

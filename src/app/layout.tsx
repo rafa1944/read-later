@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Actualizador } from '@/components/actualizador';
+import { Avisos } from '@/components/avisos';
 import { TirarParaRefrescar } from '@/components/tirar-para-refrescar';
 import { ColaPendientes } from '@/components/cola-pendientes';
 import { RegistrarSW } from '@/components/registrar-sw';
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ColaPendientes />
         <Actualizador />
         <TirarParaRefrescar />
+        <Avisos />
       </body>
     </html>
   );

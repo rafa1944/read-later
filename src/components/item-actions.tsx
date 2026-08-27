@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { borrarItem, cambiarArchivado } from '@/lib/acciones';
+import { anunciar } from '@/lib/avisos';
+import { useFila } from './contexto-fila';
 import { Estrella } from './estrella';
 
 type Props = {
@@ -17,6 +19,8 @@ export function ItemActions({ id, archivado, favorito, alBorrar = 'refrescar' }:
   const [pendiente, iniciar] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [encolada, setEncolada] = useState<string | null>(null);
+  // En el lector no hay fila que sacar, así que esto es null y se refresca sin más.
+  const fila = useFila();
 
   async function ejecutar(accion: 'archivar' | 'borrar') {
     setError(null);
@@ -38,10 +42,22 @@ export function ItemActions({ id, archivado, favorito, alBorrar = 'refrescar' }:
       return;
     }
 
+    anunciar(
+      accion === 'borrar'
+        ? 'Artículo borrado'
+        : archivado
+          ? 'Artículo devuelto a pendientes'
+          : 'Artículo archivado',
+    );
+
     if (accion === 'borrar' && alBorrar === 'volver') {
       iniciar(() => router.push('/'));
       return;
     }
+
+    // Se saca la fila con su animación antes de rehacer la lista: si no, todo
+    // lo de abajo pega un salto en cuanto responde el servidor.
+    await fila?.salir();
     iniciar(() => router.refresh());
   }
 
