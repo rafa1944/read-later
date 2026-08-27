@@ -100,3 +100,46 @@ test('el velo queda por debajo de los controles flotantes', async ({ page, reque
   expect(capas.tiron).toBeGreaterThan(capas.velo);
   expect(capas.ajustes).toBeGreaterThan(capas.velo);
 });
+
+test('en app instalada no se reserva sitio para una franja que iOS no cede', async ({
+  page,
+  request,
+}, info) => {
+  const titulo = `Standalone ${info.testId}`;
+  await request.post('/api/items', {
+    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+    data: {
+      url: `https://ejemplo.com/standalone-${info.testId}`,
+      title: titulo,
+      html: `<p>${'palabra '.repeat(300)}</p>`,
+    },
+  });
+
+  await page.goto('/login');
+  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await expect(page.getByRole('link', { name: titulo })).toBeVisible();
+
+  const enNavegador = await page
+    .locator('.columna')
+    .evaluate((el) => Number.parseFloat(getComputedStyle(el).paddingTop));
+
+  /*
+   * Se simula la consulta de medios de la app instalada. Con la barra de estado
+   * en «default» iOS no cede esa franja —la ventana mide unos 62 px menos que
+   * la pantalla y el área segura vale 0—, así que reservarle sitio solo dejaba
+   * un hueco vacío encima del contenido.
+   */
+  const enApp = await page.locator('.columna').evaluate((el) => {
+    const hoja = document.createElement('style');
+    hoja.textContent = ':root { --velo-solido: 0px }';
+    document.head.appendChild(hoja);
+    const alto = Number.parseFloat(getComputedStyle(el).paddingTop);
+    hoja.remove();
+    return alto;
+  });
+
+  expect(enNavegador, 'en navegador hay que tapar el reloj').toBeGreaterThanOrEqual(76);
+  expect(enApp, 'en app instalada no hay nada que tapar').toBeLessThan(40);
+  expect(enApp, 'pero sigue habiendo margen cómodo').toBeGreaterThanOrEqual(24);
+});
