@@ -42,6 +42,18 @@ export function Actualizador() {
       if ((evento.data as { tipo?: string })?.tipo === 'servido-de-cache') refrescar(true);
     }
 
+    /*
+     * Y no basta con escuchar. El aviso se emite mientras el navegador atiende
+     * la navegación, cuando este documento todavía no existe como cliente del
+     * service worker: quien lo recibe es la página que se está abandonando. Al
+     * recargar o al abrir la app desde el icono, nadie lo oye y la lista se
+     * queda con la copia guardada. Como con el worker al mando cualquier carga
+     * puede venir de la caché, se piden los datos frescos de entrada. Es una
+     * petición por carga de documento, no por navegación: este componente vive
+     * en el layout y no se vuelve a montar al cambiar de pestaña.
+     */
+    if (navigator.serviceWorker?.controller) refrescar(true);
+
     document.addEventListener('visibilitychange', alVolver);
     window.addEventListener('focus', alVolver);
     navigator.serviceWorker?.addEventListener('message', mensaje);

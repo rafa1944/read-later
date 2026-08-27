@@ -30,7 +30,7 @@ export function BarraLista({ recuento }: Props) {
           aria-label={soloFavoritos ? 'Mostrar todos' : 'Mostrar solo favoritos'}
           title={soloFavoritos ? 'Mostrar todos' : 'Mostrar solo favoritos'}
         >
-          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="19" height="19" aria-hidden="true">
             <path
               d="M8 1.6l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.4l-3.8 2 .7-4.3-3.1-3 4.3-.6z"
               fill={soloFavoritos ? 'currentColor' : 'none'}

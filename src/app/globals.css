@@ -258,13 +258,17 @@ a,
   margin-left: auto;
 }
 
+/*
+ * Iban dibujados con el color de las líneas divisorias y a ese contraste no se
+ * distinguían del fondo. Van a tinta tenue, como el resto de controles.
+ */
 .filtro-favoritos {
   display: grid;
   place-items: center;
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.9rem;
+  height: 1.9rem;
   border-radius: 0.2rem;
-  color: var(--linea);
+  color: var(--tenue);
 }
 
 .filtro-favoritos.activo { color: var(--lampara); }
@@ -326,10 +330,26 @@ a,
 
 .lector { max-width: var(--medida); }
 
+/*
+ * Va solo en su línea, así que aquí sí hay sitio para agrandarlo en cualquier
+ * pantalla, al revés que los cuatro enlaces de la cabecera. Con el dedo se le
+ * da además altura de toque, que es el enlace que más se usa del lector.
+ */
 .volver {
   display: inline-block;
   margin-bottom: 2.5rem;
   text-decoration: none;
+  font-size: 0.82rem;
+}
+
+@media (pointer: coarse) {
+  .volver {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    margin-bottom: 1.75rem;
+    font-size: 0.86rem;
+  }
 }
 
 .lector h1 {
@@ -583,13 +603,19 @@ a,
   z-index: 4;
 }
 
+/*
+ * Flota sobre el texto y con el fondo del tema se desvanecía, sobre todo en
+ * oscuro: la sombra no se ve sobre negro y el hilo del borde tampoco. Se le da
+ * un fondo un punto separado del de la página y un borde a tinta tenue, así
+ * que el contraste sale del color y no de la sombra, que en oscuro no existe.
+ */
 .ajustes > button {
   width: 2.6rem;
   height: 2.6rem;
-  border: 1px solid var(--linea);
+  border: 1px solid var(--tenue);
   border-radius: 50%;
-  background: var(--fondo);
-  color: var(--tenue);
+  background: color-mix(in srgb, var(--tinta) 10%, var(--fondo));
+  color: var(--tinta);
   cursor: pointer;
   font: 500 0.95rem/1 var(--serif);
 }
@@ -782,13 +808,13 @@ a,
 .densidad button {
   display: grid;
   place-items: center;
-  width: 1.65rem;
-  height: 1.65rem;
+  width: 1.9rem;
+  height: 1.9rem;
   padding: 0;
   border: 0;
   border-radius: 0.2rem;
   background: none;
-  color: var(--linea);
+  color: var(--tenue);
   cursor: pointer;
 }
 
@@ -888,11 +914,13 @@ a,
 
   .estrella:hover:not(.marcada) { color: var(--tenue); }
 
-  .filtro-favoritos:hover { color: var(--tenue); }
-  .densidad button:hover { color: var(--tenue); }
+  /* Excluyendo el activo: si no, el hover le gana al ámbar por orden y el
+     control marcado se apaga justo al pasar por encima. */
+  .filtro-favoritos:hover:not(.activo) { color: var(--tinta); }
+  .densidad button:hover:not([aria-pressed='true']) { color: var(--tinta); }
   .salir:hover:not(:disabled) { color: var(--tinta); }
   .opciones button:hover:not(:disabled) { color: var(--tinta); }
-  .ajustes > button:hover { color: var(--tinta); }
+  .ajustes > button:hover { background: color-mix(in srgb, var(--tinta) 18%, var(--fondo)); }
 }
 
 /* ---------- Salida de una fila ---------- */
