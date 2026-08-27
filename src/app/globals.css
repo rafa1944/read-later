@@ -98,7 +98,6 @@ a,
   border-bottom-color: var(--lampara);
 }
 
-.cabecera a:hover { color: var(--tinta); }
 
 /* ---------- Fila de artículo ---------- */
 
@@ -151,7 +150,6 @@ a,
 }
 
 .titulo a { text-decoration: none; }
-.titulo a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
 
 .pista {
   margin: 0.35rem 0 0;
@@ -187,8 +185,6 @@ a,
   text-transform: uppercase;
 }
 
-.acciones button:hover:not(:disabled) { color: var(--tinta); }
-.acciones button.destructiva:hover:not(:disabled) { color: var(--peligro); }
 .acciones button:disabled { opacity: 0.45; cursor: default; }
 
 /* ---------- Estados de lista ---------- */
@@ -223,7 +219,6 @@ a,
   color: var(--linea);
 }
 
-.filtro-favoritos:hover { color: var(--tenue); }
 .filtro-favoritos.activo { color: var(--lampara); }
 
 .estrella {
@@ -236,7 +231,6 @@ a,
   cursor: pointer;
 }
 
-.estrella:hover { color: var(--tenue); }
 .estrella.marcada { color: var(--lampara); }
 .estrella:active { transform: scale(0.86); }
 
@@ -548,7 +542,6 @@ a,
   font: 500 0.95rem/1 var(--serif);
 }
 
-.ajustes > button:hover { color: var(--tinta); }
 
 .panel {
   position: absolute;
@@ -589,7 +582,6 @@ a,
   font: 0.72rem/1 var(--sans);
 }
 
-.opciones button:hover:not(:disabled) { color: var(--tinta); }
 .opciones button:disabled { opacity: 0.4; cursor: default; }
 
 .opciones button[aria-pressed='true'] {
@@ -625,7 +617,6 @@ a,
   font: inherit;
 }
 
-.salir:hover:not(:disabled) { color: var(--tinta); }
 
 /* Con el aviso de «sin conexión» presente, ese es quien empuja a la derecha. */
 .sin-red + .salir { margin-left: 1.25rem; }
@@ -744,7 +735,6 @@ a,
   cursor: pointer;
 }
 
-.densidad button:hover { color: var(--tenue); }
 
 .densidad button[aria-pressed='true'] { color: var(--lampara); }
 
@@ -822,4 +812,28 @@ a,
 
   /* El aviso de la fila deslizable se aparta de los botones agrandados. */
   .accion-gesto { padding-right: 0.75rem; }
+}
+
+/* ---------- Estados de ratón ---------- */
+
+/*
+ * Todo el hover vive aquí dentro. En táctil el navegador deja el :hover pegado
+ * tras el toque, así que una regla de hover sin acotar acaba pintando de negro
+ * una estrella que acabas de marcar en ámbar. La estrella queda además fuera
+ * del hover genérico de los botones: marcada manda su color, la señales o no.
+ */
+@media (hover: hover) {
+  .cabecera a:hover { color: var(--tinta); }
+  .titulo a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+
+  .acciones button:not(.estrella):hover:not(:disabled) { color: var(--tinta); }
+  .acciones button.destructiva:hover:not(:disabled) { color: var(--peligro); }
+
+  .estrella:hover:not(.marcada) { color: var(--tenue); }
+
+  .filtro-favoritos:hover { color: var(--tenue); }
+  .densidad button:hover { color: var(--tenue); }
+  .salir:hover:not(:disabled) { color: var(--tinta); }
+  .opciones button:hover:not(:disabled) { color: var(--tinta); }
+  .ajustes > button:hover { color: var(--tinta); }
 }

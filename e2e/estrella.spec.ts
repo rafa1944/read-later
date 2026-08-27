@@ -58,3 +58,38 @@ test('la estrella no parpadea ni se atenúa al pulsarla', async ({ page, request
   await expect(estrella).toHaveAttribute('aria-pressed', 'true');
   await cdp.detach();
 });
+
+const AMBAR_CLARO = 'rgb(180, 118, 26)';
+
+test('una estrella marcada se ve ámbar, no negra', async ({ page, request }, info) => {
+  await request.post('/api/items', {
+    headers: { authorization: `Bearer ${process.env.INGEST_TOKEN}` },
+    data: {
+      url: `https://ejemplo.com/ambar-${info.testId}`,
+      title: `Ámbar ${info.testId}`,
+      html: `<p>${'palabra '.repeat(250)}</p>`,
+    },
+  });
+
+  await page.goto('/login');
+  await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+
+  const estrella = page
+    .locator('.fila', { hasText: `Ámbar ${info.testId}` })
+    .locator('.estrella');
+  await estrella.click();
+  await expect(estrella).toHaveAttribute('aria-pressed', 'true');
+
+  // Se espera a que termine la transición de color antes de mirar.
+  await page.waitForTimeout(400);
+  const color = await estrella.evaluate((el) => getComputedStyle(el).color);
+
+  // En táctil el :hover se queda pegado tras el toque: si una regla de hover
+  // se cuela, esto sale casi negro en vez de ámbar.
+  expect(color).toBe(AMBAR_CLARO);
+
+  await page.reload();
+  await expect(estrella).toHaveAttribute('aria-pressed', 'true');
+  expect(await estrella.evaluate((el) => getComputedStyle(el).color)).toBe(AMBAR_CLARO);
+});
