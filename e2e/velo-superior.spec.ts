@@ -95,28 +95,37 @@ test('el velo queda por debajo de los controles flotantes', async ({ page, reque
   expect(capas.ajustes).toBeGreaterThan(capas.velo);
 });
 
-test('no se pide la pantalla completa, para que iOS reserve la barra de estado', async ({
-  page,
-}) => {
+test('se pide la pantalla completa y la barra translúcida', async ({ page }) => {
   await page.goto('/login');
 
-  const viewport = await page
-    .locator('meta[name="viewport"]')
+  const viewport = await page.locator('meta[name="viewport"]').getAttribute('content');
+  const barra = await page
+    .locator('meta[name="apple-mobile-web-app-status-bar-style"]')
     .getAttribute('content');
 
   /*
-   * Con viewport-fit=cover el contenido se pinta detrás del reloj, pero medido
-   * en un iPhone con isla dinámica: el área segura devuelve 0 y los elementos
-   * fijos toman como origen el borde inferior de esa barra, así que no hay
-   * forma de taparlo desde CSS. Sin él, iOS reserva la franja y la pinta con el
-   * theme-color, que es el mismo fondo de la app.
+   * Las dos van juntas y son la única combinación que entrega la pantalla
+   * completa a la web en una app instalada. Con 'default', iOS coloca los
+   * elementos fijos tomando como origen el borde inferior de la barra de
+   * estado, y la banda opaca no llega nunca hasta el reloj.
    */
-  expect(viewport, 'viewport declarado').not.toContain('viewport-fit=cover');
+  expect(viewport, 'viewport declarado').toContain('viewport-fit=cover');
+  expect(barra, 'estilo de la barra de estado').toBe('black-translucent');
+});
 
-  const temas = await page.locator('meta[name="theme-color"]').evaluateAll((metas) =>
-    metas.map((m) => m.getAttribute('content')),
-  );
-  // Si el color no coincidiera con el fondo, esa franja se vería como un hueco.
-  expect(temas).toContain('#e9eae5');
-  expect(temas).toContain('#14171a');
+test('la banda opaca cubre la barra de estado', async ({ page }) => {
+  await page.goto('/login');
+
+  const solido = await page.evaluate(() => {
+    const sonda = document.createElement('div');
+    sonda.style.cssText = 'position:fixed;top:0;height:var(--velo-solido)';
+    document.body.appendChild(sonda);
+    const alto = sonda.getBoundingClientRect().height;
+    sonda.remove();
+    return alto;
+  });
+
+  // La barra de estado de un iPhone con isla dinámica ronda los 60 px, y donde
+  // no hay área segura declarada la banda tiene que taparla por sí sola.
+  expect(solido, 'banda opaca').toBeGreaterThanOrEqual(56);
 });

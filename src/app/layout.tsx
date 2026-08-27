@@ -10,27 +10,25 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Read Later',
-  appleWebApp: { capable: true, title: 'Read Later', statusBarStyle: 'default' },
+  /*
+   * black-translucent es lo único que entrega la pantalla completa a la web en
+   * una app instalada: solo entonces env(safe-area-inset-top) devuelve el valor
+   * real y un elemento fijo puede llegar hasta el borde superior. Con 'default'
+   * el origen de lo fijo queda bajo la barra y la banda no alcanzaba el reloj.
+   */
+  appleWebApp: { capable: true, title: 'Read Later', statusBarStyle: 'black-translucent' },
   icons: { apple: '/iconos/180.png' },
 };
 
-/*
- * Sin viewport-fit: cover a propósito.
- *
- * Con él, el contenido se pinta detrás de la barra de estado, pero medido en un
- * iPhone con isla dinámica: env(safe-area-inset-top) devuelve 0 y los elementos
- * fijos se posicionan tomando como origen el borde inferior de esa barra. O
- * sea, el texto pasa por debajo del reloj y no hay forma de taparlo desde CSS.
- *
- * Sin él, iOS reserva la barra y la pinta con el theme-color de abajo, que es
- * el mismo fondo de la app: el resultado se ve continuo y ningún texto llega a
- * cruzarse con la hora.
- */
+/* Pantalla completa: el contenido se desplaza bajo el reloj y la banda opaca
+ * de arriba lo va ocultando. Va de la mano de statusBarStyle black-translucent;
+ * sin él, iOS no cede esa franja. */
 export const viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#e9eae5' },
     { media: '(prefers-color-scheme: dark)', color: '#14171a' },
   ],
+  viewportFit: 'cover' as const,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

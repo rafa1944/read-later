@@ -16,12 +16,15 @@
   --medida: 34rem;
 
   /*
-   * Desvanecimiento en el borde superior del contenido. Ya no tiene que tapar
-   * la barra de estado —de eso se encarga iOS al reservarla—, solo suavizar el
-   * corte del texto que sube.
+   * Banda opaca que oculta el texto al pasar bajo el reloj, más un
+   * desvanecimiento por debajo para que la desaparición no sea un corte seco.
+   *
+   * El mínimo de 3,75 rem son los ~60 px de la barra de estado de un iPhone con
+   * isla dinámica, y cubre el caso de Safari, donde el área segura devuelve 0
+   * aunque el contenido sí pase bajo el reloj.
    */
-  --velo-solido: 0.5rem;
-  --velo-fundido: 1.5rem;
+  --velo-solido: max(3.75rem, env(safe-area-inset-top, 0px));
+  --velo-fundido: 2rem;
 
   --serif: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
