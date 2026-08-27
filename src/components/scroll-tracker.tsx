@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { marcoDesplazable, posicionDeLectura } from '@/lib/desplazamiento';
 
 type Props = { id: string; inicial: number };
 
@@ -13,15 +14,11 @@ export function Rail({ id, inicial }: Props) {
   const ultimoEnviado = useRef(inicial);
 
   useEffect(() => {
-    function posicion(): number {
-      const alto = document.documentElement.scrollHeight - window.innerHeight;
-      if (alto <= 0) return 1;
-      return Math.min(1, Math.max(0, window.scrollY / alto));
-    }
+    const marco = marcoDesplazable();
+    const posicion = () => posicionDeLectura(marco);
 
     if (inicial > 0.02 && inicial < 0.98) {
-      const alto = document.documentElement.scrollHeight - window.innerHeight;
-      window.scrollTo({ top: alto * inicial });
+      marco.scrollTo({ top: (marco.scrollHeight - marco.clientHeight) * inicial });
     } else {
       setAvance(posicion());
     }
@@ -46,13 +43,13 @@ export function Rail({ id, inicial }: Props) {
       temporizador = setTimeout(enviar, 700);
     }
 
-    window.addEventListener('scroll', alDesplazar, { passive: true });
+    marco.addEventListener('scroll', alDesplazar, { passive: true });
     // keepalive permite que el último envío salga aunque se cierre la pestaña.
     window.addEventListener('pagehide', enviar);
 
     return () => {
       clearTimeout(temporizador);
-      window.removeEventListener('scroll', alDesplazar);
+      marco.removeEventListener('scroll', alDesplazar);
       window.removeEventListener('pagehide', enviar);
       enviar();
     };

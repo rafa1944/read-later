@@ -3,7 +3,6 @@ import { Actualizador } from '@/components/actualizador';
 import { Avisos } from '@/components/avisos';
 import { TirarParaRefrescar } from '@/components/tirar-para-refrescar';
 import { ColaPendientes } from '@/components/cola-pendientes';
-import { Marco } from '@/components/marco';
 import { RegistrarSW } from '@/components/registrar-sw';
 import { Sincronizador } from '@/components/sincronizador';
 import { GUION_INICIAL } from '@/lib/ajustes';
@@ -45,14 +44,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: GUION_INICIAL }} />
       </head>
       <body>
-        {children}
+        {/*
+          El contenido se desplaza dentro de este contenedor, que empieza bajo
+          la barra de estado. Así el texto no se tapa al subir: queda recortado,
+          porque fuera del contenedor no puede pintarse nada. Taparlo con una
+          banda no funcionaba, porque en iOS el contenido y los elementos fijos
+          no comparten origen.
+        */}
+        <div id="marco">{children}</div>
         <RegistrarSW />
         <Sincronizador />
         <ColaPendientes />
         <Actualizador />
         <TirarParaRefrescar />
         <Avisos />
-        <Marco />
       </body>
     </html>
   );

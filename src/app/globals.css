@@ -49,29 +49,25 @@
  * texto se pierda bajo la muesca en lugar de chocar con el reloj. No captura
  * toques, o se comería el enlace de volver.
  */
-body::before {
-  content: '';
+/*
+ * El contenedor del contenido. Empieza donde acaba el área segura, así que el
+ * texto que sube se recorta ahí en lugar de meterse bajo el reloj. Encima solo
+ * se ve el fondo del body, que es opaco y sigue al tema.
+ */
+#marco {
   position: fixed;
-  inset: 0 0 auto 0;
-  /*
-   * Se sube el desfase medido en JavaScript. En la app instalada de iOS un
-   * elemento fijo empieza por debajo de la barra de estado mientras el
-   * contenido se pinta desde el borde de la pantalla: sin esto, la banda se
-   * dibuja bajo el reloj y el texto se ve pasar por detrás de la hora.
-   */
-  top: calc(-1 * var(--desfase-fijo, 0px));
-  height: calc(var(--velo-solido) + var(--velo-fundido));
-  background: linear-gradient(
-    to bottom,
-    var(--fondo) 0,
-    var(--fondo) var(--velo-solido),
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: 3;
+  inset: env(safe-area-inset-top, 0px) 0 0 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 html { -webkit-text-size-adjust: 100%; }
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
 
 body {
   margin: 0;

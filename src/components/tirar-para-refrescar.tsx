@@ -9,6 +9,7 @@ import {
   distanciaDeSobrescroll,
   type Eje,
 } from '@/lib/gestos';
+import { marcoDesplazable } from '@/lib/desplazamiento';
 import { EVENTO_SINCRONIZAR } from './sincronizador';
 
 const MAXIMO = 96;
@@ -38,6 +39,8 @@ export function TirarParaRefrescar() {
   const recargandoRef = useRef(false);
 
   useEffect(() => {
+    const marco = marcoDesplazable();
+
     function anotar(recorrido: number) {
       if (recargandoRef.current) return;
       if (recorrido > maximo.current) maximo.current = recorrido;
@@ -45,7 +48,7 @@ export function TirarParaRefrescar() {
     }
 
     function alEmpezar(evento: TouchEvent) {
-      if (window.scrollY > 0 || evento.touches.length !== 1) {
+      if (marco.scrollTop > 0 || evento.touches.length !== 1) {
         inicio.current = null;
         return;
       }
@@ -70,7 +73,7 @@ export function TirarParaRefrescar() {
     }
 
     function alDesplazar() {
-      const rebote = distanciaDeSobrescroll(window.scrollY);
+      const rebote = distanciaDeSobrescroll(marco.scrollTop);
       if (rebote > 0) anotar(Math.min(rebote, MAXIMO));
     }
 
@@ -102,14 +105,14 @@ export function TirarParaRefrescar() {
     document.addEventListener('touchmove', alMover, { passive: false });
     document.addEventListener('touchend', alSoltar, { passive: true });
     document.addEventListener('touchcancel', alSoltar, { passive: true });
-    window.addEventListener('scroll', alDesplazar, { passive: true });
+    marco.addEventListener('scroll', alDesplazar, { passive: true });
 
     return () => {
       document.removeEventListener('touchstart', alEmpezar);
       document.removeEventListener('touchmove', alMover);
       document.removeEventListener('touchend', alSoltar);
       document.removeEventListener('touchcancel', alSoltar);
-      window.removeEventListener('scroll', alDesplazar);
+      marco.removeEventListener('scroll', alDesplazar);
     };
   }, [router]);
 
