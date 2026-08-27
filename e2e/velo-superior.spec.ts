@@ -39,8 +39,19 @@ test('el velo superior cubre el contenido pero no captura los toques', async ({
   expect(velo.toques).toBe('none');
   expect(velo.fondo).toContain('gradient');
 
-  // Y el degradado va de opaco a transparente, no al revés.
-  expect(velo.fondo.indexOf('rgba(0, 0, 0, 0)')).toBeGreaterThan(20);
+  /*
+   * El velo tiene que ser SÓLIDO durante toda el área segura y desvanecerse
+   * solo por debajo. Repartir el degradado por toda la banda lo dejaba casi
+   * transparente justo a la altura del reloj, que fue el primer intento.
+   *
+   * Se comprueba que el color de fondo aparece dos veces —inicio y final del
+   * tramo opaco— antes de la parada transparente.
+   */
+  const fondoSolido = velo.fondo.match(/rgb\((?!0, 0, 0\))[^)]+\)/g) ?? [];
+  expect(fondoSolido.length, `paradas del degradado: ${velo.fondo}`).toBeGreaterThanOrEqual(2);
+  expect(velo.fondo.indexOf('rgba(0, 0, 0, 0)')).toBeGreaterThan(
+    velo.fondo.indexOf(fondoSolido[fondoSolido.length - 1]),
+  );
 
   // La comprobación que de verdad importa: el enlace sigue siendo pulsable.
   await page.getByRole('link', { name: '← Pendientes' }).click();

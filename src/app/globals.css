@@ -42,8 +42,18 @@ body::before {
   content: '';
   position: fixed;
   inset: 0 0 auto 0;
-  height: calc(env(safe-area-inset-top, 0px) + 1.5rem);
-  background: linear-gradient(to bottom, var(--fondo) 0%, var(--fondo) 42%, transparent 100%);
+  height: calc(env(safe-area-inset-top, 0px) + 2.75rem);
+  /*
+   * Sólido durante toda el área segura y 0,5 rem más, y solo entonces se
+   * desvanece. Repartir el degradado por toda la banda dejaba el velo casi
+   * transparente justo a la altura del reloj, que es donde más se nota.
+   */
+  background: linear-gradient(
+    to bottom,
+    var(--fondo) 0,
+    var(--fondo) calc(100% - 2.25rem),
+    transparent 100%
+  );
   pointer-events: none;
   z-index: 3;
 }
