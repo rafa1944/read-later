@@ -27,8 +27,25 @@ export function Diagnostico() {
       const registro = await navigator.serviceWorker?.getRegistration();
       const nombres = 'caches' in window ? await caches.keys() : [];
 
+      const metaTema = [...document.querySelectorAll('meta[name="theme-color"]')]
+        .map((m) => `${m.getAttribute('content')} ${m.getAttribute('media') ?? ''}`.trim())
+        .join(' | ');
+      const barraApple =
+        document
+          .querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')
+          ?.getAttribute('content') ?? '(sin meta)';
+
       setDatos([
         { clave: 'Área segura superior', valor: `${areaSegura} px` },
+        {
+          // Si la ventana mide lo mismo que la pantalla, la vista llega hasta
+          // arriba y la franja es un problema de color. Si mide menos, es que
+          // iOS reserva una barra propia y hay que pedirle que no lo haga.
+          clave: 'Ventana / pantalla',
+          valor: `${window.innerHeight} / ${screen.height} px`,
+        },
+        { clave: 'Barra de estado', valor: barraApple },
+        { clave: 'theme-color', valor: metaTema },
         { clave: 'Alto del velo', valor: velo.height },
         { clave: 'Velo: parada opaca', valor: velo.backgroundImage.slice(0, 120) },
         { clave: 'Capa del velo', valor: velo.zIndex },

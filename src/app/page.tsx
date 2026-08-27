@@ -1,5 +1,6 @@
 import { BarraLista } from '@/components/barra-lista';
 import { Cabecera } from '@/components/cabecera';
+import { PieApp } from '@/components/pie-app';
 import { ItemCard } from '@/components/item-card';
 import { listItems } from '@/services/items';
 
@@ -32,6 +33,8 @@ export default async function Pendientes({
       {items.map((item) => (
         <ItemCard key={item.id} item={item} />
       ))}
+
+      <PieApp />
     </main>
   );
 }

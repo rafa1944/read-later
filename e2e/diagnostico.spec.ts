@@ -8,7 +8,12 @@ test('el diagnóstico informa del estado real del dispositivo', async ({ page })
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('link', { name: 'Archivo' })).toBeVisible();
 
-  await page.goto('/diagnostico');
+  /*
+   * Se llega pulsando, no escribiendo la dirección: en una app instalada no hay
+   * barra donde escribirla, y su almacenamiento en iOS está separado del de
+   * Safari, así que mirarlo desde el navegador no dice nada de la app.
+   */
+  await page.getByRole('link', { name: 'Diagnóstico' }).click();
   await expect(page.getByRole('heading', { name: 'Diagnóstico' })).toBeVisible();
 
   for (const fila of ['Área segura superior', 'Alto del velo', 'Cachés', 'Modo de pantalla']) {
