@@ -134,6 +134,12 @@ test.describe('lector con el dedo', () => {
     await page.getByLabel('Contraseña').fill(process.env.APP_PASSWORD!);
     await page.getByRole('button', { name: 'Entrar' }).click();
     await page.getByRole('link', { name: titulo }).click();
+    /*
+     * Esperar a la URL, no al título: en el listado el título ya es un encabezado
+     * con ese mismo texto, así que esperarlo no demuestra nada. Y a media
+     * navegación el botón flotante se sustituye y boundingBox() sale null.
+     */
+    await page.waitForURL(/\/a\//);
 
     const boton = page.getByRole('button', { name: 'Ajustes de lectura' });
     await expect(boton).toBeVisible();

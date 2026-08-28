@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { debeRefrescar } from '@/lib/refresco';
 import { EVENTO_SINCRONIZAR } from './sincronizador';
@@ -12,7 +12,11 @@ import { EVENTO_SINCRONIZAR } from './sincronizador';
  */
 export function Actualizador() {
   const router = useRouter();
+  const ruta = usePathname();
   const ultimo = useRef(0);
+
+  // Solo las listas se quedan viejas. El texto de un artículo no cambia nunca.
+  const esListado = ruta === '/' || ruta === '/archivo' || ruta === '/buscar';
 
   useEffect(() => {
     function refrescar(forzar = false) {
@@ -39,6 +43,13 @@ export function Actualizador() {
      * corrige solo en cuanto responde el servidor.
      */
     function mensaje(evento: MessageEvent) {
+      /*
+       * También aquí solo el listado. El aviso es una emisión a todos los
+       * clientes y el sincronizador calienta la caché por detrás, así que
+       * mientras lees llegan avisos de páginas que no estás viendo: refrescar
+       * por ellos rehace el árbol y te cierra el panel de ajustes en la cara.
+       */
+      if (!esListado) return;
       if ((evento.data as { tipo?: string })?.tipo === 'servido-de-cache') refrescar(true);
     }
 
@@ -52,8 +63,6 @@ export function Actualizador() {
      * petición por carga de documento, no por navegación: este componente vive
      * en el layout y no se vuelve a montar al cambiar de pestaña.
      */
-    if (navigator.serviceWorker?.controller) refrescar(true);
-
     document.addEventListener('visibilitychange', alVolver);
     window.addEventListener('focus', alVolver);
     navigator.serviceWorker?.addEventListener('message', mensaje);
@@ -63,7 +72,7 @@ export function Actualizador() {
       window.removeEventListener('focus', alVolver);
       navigator.serviceWorker?.removeEventListener('message', mensaje);
     };
-  }, [router]);
+  }, [router, esListado]);
 
   return null;
 }

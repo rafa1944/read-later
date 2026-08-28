@@ -34,17 +34,37 @@ const ANCHOS: { valor: Ancho; texto: string }[] = [
   { valor: 'ancho', texto: 'Ancho' },
 ];
 
-export function AjustesLectura() {
+type Props = {
+  /*
+   * En el listado se ofrecen solo la tipografía y el tema, que son los dos que
+   * se notan ahí: los títulos se pintan con --serif y el tema es de toda la
+   * página. El tamaño de letra solo escala el cuerpo del artículo y el ancho de
+   * columna no llega a mover la lista, así que allí serían mandos muertos.
+   */
+  ambito?: 'lector' | 'lista';
+};
+
+export function AjustesLectura({ ambito = 'lector' }: Props) {
+  const enLector = ambito === 'lector';
   const [abierto, setAbierto] = useState(false);
   const [ajustes, setAjustes] = useState<Ajustes>(AJUSTES_POR_DEFECTO);
   const contenedor = useRef<HTMLDivElement>(null);
+  /*
+   * Espejo de lo último elegido. Sin esto, dos pulsaciones dentro del mismo
+   * ciclo de React parten las dos del mismo estado y la segunda pisa a la
+   * primera: eliges tipografía y tema seguidos y solo se queda el tema.
+   */
+  const actuales = useRef<Ajustes>(AJUSTES_POR_DEFECTO);
 
   useEffect(() => {
+    let cargados: Ajustes;
     try {
-      setAjustes(normalizarAjustes(JSON.parse(localStorage.getItem(CLAVE_AJUSTES) ?? 'null')));
+      cargados = normalizarAjustes(JSON.parse(localStorage.getItem(CLAVE_AJUSTES) ?? 'null'));
     } catch {
-      setAjustes(AJUSTES_POR_DEFECTO);
+      cargados = AJUSTES_POR_DEFECTO;
     }
+    actuales.current = cargados;
+    setAjustes(cargados);
   }, []);
 
   useEffect(() => {
@@ -66,7 +86,8 @@ export function AjustesLectura() {
   }, [abierto]);
 
   function cambiar(parcial: Partial<Ajustes>) {
-    const nuevos = normalizarAjustes({ ...ajustes, ...parcial });
+    const nuevos = normalizarAjustes({ ...actuales.current, ...parcial });
+    actuales.current = nuevos;
     setAjustes(nuevos);
     aplicarAjustes(nuevos);
     try {
@@ -80,6 +101,7 @@ export function AjustesLectura() {
     <div className="ajustes" ref={contenedor}>
       {abierto && (
         <div className="panel" role="dialog" aria-label="Ajustes de lectura">
+          {enLector && (
           <fieldset>
             <legend>Tamaño de letra</legend>
             <div className="opciones">
@@ -101,6 +123,7 @@ export function AjustesLectura() {
               </button>
             </div>
           </fieldset>
+          )}
 
           <fieldset>
             <legend>Tipografía</legend>
@@ -119,6 +142,7 @@ export function AjustesLectura() {
             </div>
           </fieldset>
 
+          {enLector && (
           <fieldset>
             <legend>Ancho de columna</legend>
             <div className="opciones">
@@ -134,6 +158,7 @@ export function AjustesLectura() {
               ))}
             </div>
           </fieldset>
+          )}
 
           <fieldset>
             <legend>Tema</legend>

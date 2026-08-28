@@ -34,6 +34,7 @@ test('buscar por una palabra del cuerpo y abrir el resultado', async ({ page }) 
 
 test('los ajustes de lectura se aplican y sobreviven a una recarga', async ({ page }) => {
   await page.getByRole('link', { name: TITULO }).first().click();
+  await page.waitForURL(/\/a\//);
 
   await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
   await page.getByRole('button', { name: 'Sepia' }).click();
@@ -44,4 +45,24 @@ test('los ajustes de lectura se aplican y sobreviven a una recarga', async ({ pa
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-tema', 'sepia');
   await expect(page.locator('html')).toHaveAttribute('data-ancho', 'ancho');
+});
+
+test('desde el listado se cambian tipografía y tema, y viajan al artículo', async ({ page }) => {
+  await page.getByRole('button', { name: 'Ajustes de lectura' }).click();
+
+  // En la lista solo se ofrecen los dos que allí se notan.
+  await expect(page.locator('.panel legend')).toHaveText(['Tipografía', 'Tema']);
+
+  // Seguidos y sin esperar entre medias: así se comprueba que la segunda
+  // elección no parte del estado anterior y borra la primera.
+  await page.getByRole('button', { name: 'Palo seco' }).click();
+  await page.getByRole('button', { name: 'Oscuro' }).click();
+
+  await expect(page.locator('html')).toHaveAttribute('data-letra', 'palo');
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'oscuro');
+
+  await page.getByRole('link', { name: TITULO }).first().click();
+  await expect(page.getByRole('heading', { name: TITULO })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-letra', 'palo');
+  await expect(page.locator('html')).toHaveAttribute('data-tema', 'oscuro');
 });

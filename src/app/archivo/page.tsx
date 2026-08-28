@@ -1,3 +1,4 @@
+import { AjustesLectura } from '@/components/ajustes-lectura';
 import { BarraLista } from '@/components/barra-lista';
 import { Cabecera } from '@/components/cabecera';
 import { PieApp } from '@/components/pie-app';
@@ -35,6 +36,7 @@ export default async function Archivo({
       ))}
 
       <PieApp />
+      <AjustesLectura ambito="lista" />
     </main>
   );
 }

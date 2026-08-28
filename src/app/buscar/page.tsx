@@ -1,3 +1,4 @@
+import { AjustesLectura } from '@/components/ajustes-lectura';
 import { Cabecera } from '@/components/cabecera';
 import { Resultado } from '@/components/resultado';
 import { searchItems } from '@/services/items';
@@ -48,6 +49,8 @@ export default async function Buscar({
       {resultados.map((item) => (
         <Resultado key={item.id} item={item} />
       ))}
+
+      <AjustesLectura ambito="lista" />
     </main>
   );
 }
